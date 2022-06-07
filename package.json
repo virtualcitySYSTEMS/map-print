@@ -1,0 +1,53 @@
+{
+  "name": "print",
+  "version": "0.1.0",
+  "description": "VC Map Plugin for taking screenshots and creating PDFs of the current view of the map.",
+  "main": "src/index.js",
+  "scripts": {
+    "prepublishOnly": "vcmplugin build",
+    "build": "vcmplugin build",
+    "pack": "vcmplugin pack",
+    "start": "vcmplugin serve",
+    "preview": "vcmplugin preview",
+    "lint": "eslint \"{src,tests}/**/*.{js,vue}\""
+  },
+  "author": "Virtual City Systems",
+  "license": "MIT",
+  "keywords": [
+    "vcmap",
+    "plugin"
+  ],
+  "files": [
+    "src/",
+    "dist/",
+    "plugin-assets/",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./src/index.js",
+    "./dist": "./dist/index.js"
+  },
+  "repository": {
+    "url": "https://gitlab.virtualcitysystems.de/vcsuite/npm/vcmap/print"
+  },
+  "eslintIgnore": [
+    "node_modules"
+  ],
+  "eslintConfig": {
+    "root": true,
+    "extends": "@vcsuite/eslint-config/vue"
+  },
+  "peerDependencies": {
+    "@vcmap/cesium": "^1.93.1",
+    "@vcmap/core": "^5.0.0-rc.11",
+    "@vcmap/ui": "^5.0.0-rc.8",
+    "@vcsuite/ui-components": "^0.1.15",
+    "@vue/composition-api": "~1.4.5",
+    "ol": "~6.13.0"
+  },
+  "devDependencies": {
+    "@vcmap/plugin-cli": "^2.0.4",
+    "@vcsuite/eslint-config": "^2.1.1"
+  }
+}
