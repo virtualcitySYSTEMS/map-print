@@ -1,35 +1,133 @@
-import { WindowSlot } from '@vcmap/ui';
+import { ButtonLocation, createToggleAction, WindowSlot } from '@vcmap/ui';
 import { version, name } from '../package.json';
-import HelloWorld, { windowId } from './helloWorld.vue';
+import PdfWindow, { pdfWindowId } from './pdf/pdfWindow.vue';
+import ScreenshotWindow, { screenshotWindowId } from './screenshot/screenshotWindow.vue';
+import { getSetupAndState } from './common/configManager.js';
+import getDefaultConfig from './defaultConfig.js';
 
 /**
- * @param {VcsApp} app - the app from which this plugin is loaded.
  * @param {Object} config - the configuration of this plugin instance, passed in from the app.
- * @returns {VcsPlugin}
+ * @returns {Object}
  */
-export default function helloWorld(app, config) {
+export default (config) => {
+  const { pluginSetup, pluginState } = getSetupAndState(config, getDefaultConfig());
+
   return {
     get name() { return name; },
     get version() { return version; },
-    initialize: async (vcsUiApp) => {
-      console.log('Called before loading the rest of the current context. Passed in the containing Vcs UI App ');
-      console.log(app, config);
-      console.log(vcsUiApp);
-    },
+    config: pluginSetup,
+    state: pluginState,
     onVcsAppMounted: async (vcsUiApp) => {
-      console.log('Called when the root UI component is mounted and managers are ready to accept components');
-      vcsUiApp.windowManager.add({
-        id: windowId,
-        component: HelloWorld,
-        WindowSlot: WindowSlot.DETACHED,
-        position: {
-          left: '40%',
-          right: '40%',
+      let { action } = createToggleAction(
+        {
+          name: 'print.pdf.header',
+          icon: '$vcsPdf',
+          title: 'print.pdf.tooltip',
         },
-      }, name);
+        {
+          id: pdfWindowId,
+          component: PdfWindow,
+          slot: WindowSlot.DYNAMIC_RIGHT,
+          state: {
+            headerTitle: 'print.pdf.header',
+            styles: { width: '280px', height: 'auto' },
+          },
+        },
+        vcsUiApp.windowManager,
+        name,
+      );
+      vcsUiApp.navbarManager.add(
+        { id: pdfWindowId, action },
+        name,
+        ButtonLocation.SHARE,
+      );
+      ({ action } = createToggleAction(
+        {
+          name: 'print.image.header',
+          icon: '$vcsScreenshot',
+          title: 'print.image.tooltip',
+        },
+        {
+          id: screenshotWindowId,
+          component: ScreenshotWindow,
+          slot: WindowSlot.DYNAMIC_RIGHT,
+          state: {
+            headerTitle: 'print.image.header',
+            styles: { width: '280px', height: 'auto' },
+          },
+        },
+        vcsUiApp.windowManager,
+        name,
+      ));
+      vcsUiApp.navbarManager.add(
+        { id: screenshotWindowId, action },
+        name,
+        ButtonLocation.SHARE,
+      );
     },
-    toJSON: async () => {
-      console.log('Called when serializing this plugin instance');
+    i18n: {
+      de: {
+        print: {
+          pdf: {
+            tooltip: 'PDF mit der aktuellen Ansicht erstellen.',
+            header: 'PDF Erstellen',
+            format: 'Papierformat',
+            resolution: 'Auflösung',
+            portrait: 'Hochformat',
+            landscape: 'Querformat',
+            titlePlaceholder: 'Hier Titel einfügen',
+            descriptionPlaceholder: 'Hier Beschreibung einfügen, kann mehrzeilig sein',
+            createButton: 'Erstellen',
+            content: {
+              contact: {
+                header: 'Kontakt',
+                mail: 'E-Mail',
+                phone: 'Tel.',
+                fax: 'Fax',
+              },
+              mapInfo: 'Karten Information',
+              coordinates: 'Koordinaten',
+            },
+          },
+          image: {
+            tooltip: 'JPG mit der aktuellen Ansicht erstellen.',
+            header: 'JPG Erstellen',
+            resolution: 'Auflösung',
+            createButton: 'Erstellen',
+          },
+        },
+      },
+      en: {
+        print: {
+          pdf: {
+            tooltip: 'Create PDF of current view.',
+            header: 'Create PDF',
+            format: 'Paper Size',
+            resolution: 'Resolution',
+            portrait: 'Portrait',
+            landscape: 'Landscape',
+            titlePlaceholder: 'Insert title here',
+            descriptionPlaceholder: 'Insert description here, can be multiline',
+            createButton: 'Create',
+            content: {
+              contact: {
+                header: 'Contact',
+                mail: 'E-Mail',
+                phone: 'Tel.',
+                fax: 'Fax',
+              },
+              mapInfo: 'Map Information',
+              coordinates: 'Coordinates',
+            },
+          },
+          image: {
+            tooltip: 'Create JPG of current view.',
+            header: 'Create JPG',
+            resolution: 'Resolution',
+            createButton: 'Create',
+          },
+        },
+      },
     },
   };
-}
+};

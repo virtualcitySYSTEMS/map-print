@@ -1,3 +1,13 @@
 {
-  "name": "print"
+  "name": "@vcmap/print",
+  "contactDetails": {
+    "department": "Entwicklung",
+    "name": "Virtual City Systems",
+    "streetAddress": "Tauentzienstr. 7 b/c",
+    "zipAndCity": "10789 Berlin",
+    "country": "Germany",
+    "mail": "info@vc.systems",
+    "phone": "+49 (0) 30 . 8904 . 871 . 0",
+    "fax": "+49 (0) 30 . 8904 . 871 . 0"
+  }
 }
