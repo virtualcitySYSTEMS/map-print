@@ -57,7 +57,7 @@ export async function getLogo(app) {
  */
 export async function getMapInfo(app, plugin) {
   const coordinatesTitle = plugin.i18n[app.locale].print.pdf.content.coordinates;
-  const viewpoint = await app.maps.activeMap.getViewPoint();
+  const viewpoint = await app.maps.activeMap.getViewpoint();
   const { groundPosition } = viewpoint;
   const coordinates = `${coordinatesTitle}: ${groundPosition[0].toFixed(4)}, ${groundPosition[1].toFixed(4)}`;
   return {

@@ -40,13 +40,11 @@
     "jspdf": "^2.5.1"
   },
   "peerDependencies": {
-    "@vcmap/cesium": "^1.93.1",
-    "@vcmap/core": "^5.0.0-rc.20",
-    "@vcmap/ui": "^5.0.0-rc.12",
+    "@vcmap/core": "~5.0.0-rc.22",
+    "@vcmap/ui": "^5.0.0-rc.14",
     "@vcsuite/check": "^1.1.2",
     "@vcsuite/logger": "^1.0.1",
     "@vcsuite/parsers": "^1.0.1",
-    "ol": "~6.13.0",
     "vue": "~2.7.3"
   },
   "devDependencies": {
