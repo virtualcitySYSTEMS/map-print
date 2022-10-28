@@ -113,6 +113,14 @@
   import {
     VcsSelect, VcsTextField, VcsTextArea, VcsLabel, VcsButton, VcsRadio, getPluginAssetUrl,
   } from '@vcmap/ui';
+  import {
+    VOverlay,
+    VIcon,
+    VContainer,
+    VRow,
+    VCol,
+    VDivider,
+  } from 'vuetify/lib';
   import PDFCreator from './pdfCreator.js';
   import createAndHandleBlob from '../screenshot/shootScreenAndHandle.js';
   import { name } from '../../package.json';
@@ -130,6 +138,12 @@
       VcsButton,
       VcsTextArea,
       VcsRadio,
+      VOverlay,
+      VIcon,
+      VContainer,
+      VRow,
+      VCol,
+      VDivider,
     },
     setup() {
       /**

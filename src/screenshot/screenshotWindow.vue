@@ -48,6 +48,14 @@
 <script>
   import { computed, inject, onMounted, onUnmounted, ref } from 'vue';
   import { VcsSelect, VcsLabel, VcsButton } from '@vcmap/ui';
+  import {
+    VOverlay,
+    VIcon,
+    VContainer,
+    VRow,
+    VCol,
+    VDivider,
+  } from 'vuetify/lib';
   import createAndHandleBlob from './shootScreenAndHandle.js';
   import { getMapAspectRatio } from '../common/util.js';
 
@@ -59,6 +67,12 @@
       VcsSelect,
       VcsLabel,
       VcsButton,
+      VOverlay,
+      VIcon,
+      VContainer,
+      VRow,
+      VCol,
+      VDivider,
     },
     setup() {
       const app = inject('vcsApp');
