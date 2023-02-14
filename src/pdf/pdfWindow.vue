@@ -201,7 +201,7 @@
         });
         // after setup possible to execute pdfCreator.create()
         const width = pdfCreator.imgPlacement.size.width * pluginState.selectedPpi;
-        await createAndHandleBlob(app, running, width, pdfCreator.create.bind(pdfCreator));
+        await createAndHandleBlob(app, running, width, pdfCreator.create.bind(pdfCreator), 'map.pdf');
       }
 
       return {

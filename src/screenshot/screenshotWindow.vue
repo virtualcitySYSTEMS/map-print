@@ -145,7 +145,7 @@
         };
         const width = mapAspectRatio.value >= 1 ?
           pluginState.selectedResolution : pluginState.selectedResolution * mapAspectRatio.value;
-        await createAndHandleBlob(app, running, width, jpgCreateFunction);
+        await createAndHandleBlob(app, running, width, jpgCreateFunction, 'map.jpg');
       }
 
       return {
