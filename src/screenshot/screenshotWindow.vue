@@ -10,7 +10,7 @@
         $vcsProgress
       </v-icon>
     </v-overlay>
-    <v-container class="py-2 px-2">
+    <v-container class="py-0 px-1">
       <v-row
         no-gutters
         align="center"
