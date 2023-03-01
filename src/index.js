@@ -30,6 +30,7 @@ export default (config) => {
           slot: WindowSlot.DYNAMIC_RIGHT,
           state: {
             headerTitle: 'print.pdf.header',
+            headerIcon: '$vcsPdf',
             styles: { width: '280px', height: 'auto' },
           },
         },
@@ -53,6 +54,7 @@ export default (config) => {
           slot: WindowSlot.DYNAMIC_RIGHT,
           state: {
             headerTitle: 'print.image.header',
+            headerIcon: '$vcsScreenshot',
             styles: { width: '280px', height: 'auto' },
           },
         },

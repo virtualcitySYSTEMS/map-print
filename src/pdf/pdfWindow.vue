@@ -84,7 +84,7 @@
         <v-col>
           <VcsTextArea
             :placeholder="$t('print.pdf.descriptionPlaceholder')"
-            class="pb-5"
+            class="pb-4"
             rows="2"
             v-model="pluginState.description"
             v-if="pluginSetup.allowDescription"
