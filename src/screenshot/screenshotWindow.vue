@@ -1,20 +1,10 @@
 <template>
   <div>
-    <v-overlay
-      :value="running"
-      absolute
-      :opacity="1"
-      color="basic"
-    >
-      <v-icon x-large color="primary">
-        $vcsProgress
-      </v-icon>
+    <v-overlay :value="running" absolute :opacity="1" color="basic">
+      <v-icon x-large color="primary"> $vcsProgress </v-icon>
     </v-overlay>
     <v-container class="py-0 px-1">
-      <v-row
-        no-gutters
-        align="center"
-      >
+      <v-row no-gutters align="center">
         <v-col cols="5">
           <VcsLabel html-for="sizeSelect" :dense="true">
             {{ $t('print.image.resolution') }}
@@ -31,23 +21,21 @@
       </v-row>
     </v-container>
     <v-divider />
-    <div class="d-flex flex-row-reverse justify-space-between">
-      <VcsButton class="py-2 px-2" color="primary" @click="createJPG()">
+    <div class="d-flex w-full justify-end px-2 pt-2 pb-1">
+      <VcsFormButton @click="createJPG()" variant="filled">
         <span class="text-uppercase">
           {{ $t('print.image.createButton') }}
         </span>
-      </VcsButton>
+      </VcsFormButton>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
 
 <script>
   import { computed, inject, onMounted, onUnmounted, ref } from 'vue';
-  import { VcsSelect, VcsLabel, VcsButton } from '@vcmap/ui';
+  import { VcsSelect, VcsLabel, VcsFormButton } from '@vcmap/ui';
   import {
     VOverlay,
     VIcon,
@@ -66,7 +54,7 @@
     components: {
       VcsSelect,
       VcsLabel,
-      VcsButton,
+      VcsFormButton,
       VOverlay,
       VIcon,
       VContainer,
@@ -110,7 +98,9 @@
       // When resized then calculate the aspect ratio of map.
       onMounted(() => window.addEventListener('resize', handleResizeEvent));
 
-      onUnmounted(() => window.removeEventListener('resize', handleResizeEvent));
+      onUnmounted(() =>
+        window.removeEventListener('resize', handleResizeEvent),
+      );
 
       // calculate the possible width and heights for creating the screenshot.
       // is calculated from the config resolutionList.
@@ -141,11 +131,21 @@
        */
       async function createJPG() {
         const jpgCreateFunction = (canvas) => {
-          return new Promise((resolve) => { canvas.toBlob(resolve, 'image/jpeg'); });
+          return new Promise((resolve) => {
+            canvas.toBlob(resolve, 'image/jpeg');
+          });
         };
-        const width = mapAspectRatio.value >= 1 ?
-          pluginState.selectedResolution : pluginState.selectedResolution * mapAspectRatio.value;
-        await createAndHandleBlob(app, running, width, jpgCreateFunction, 'map.jpg');
+        const width =
+          mapAspectRatio.value >= 1
+            ? pluginState.selectedResolution
+            : pluginState.selectedResolution * mapAspectRatio.value;
+        await createAndHandleBlob(
+          app,
+          running,
+          width,
+          jpgCreateFunction,
+          'map.jpg',
+        );
       }
 
       return {

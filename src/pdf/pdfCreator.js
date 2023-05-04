@@ -1,7 +1,10 @@
 import { jsPDF } from 'jspdf';
 import pageSizes from './standardPageSizes.js';
 import { pageStyles, FontWeights } from './styles.js';
-import { contactKeysPattern, OrientationOptions } from '../common/configManager.js';
+import {
+  contactKeysPattern,
+  OrientationOptions,
+} from '../common/configManager.js';
 
 /**
  * @typedef {Object} Coords 2D coordinates. Origin is upper left corner.
@@ -50,7 +53,10 @@ export default class PDFCreator {
    */
   async setup(pdfCreatorOptions) {
     if (pageStyles[pdfCreatorOptions.format]) {
-      this.formatting = Object.assign(pageStyles.default, pageStyles[pdfCreatorOptions.format]);
+      this.formatting = Object.assign(
+        pageStyles.default,
+        pageStyles[pdfCreatorOptions.format],
+      );
     } else {
       this.formatting = pageStyles.default;
     }
@@ -59,25 +65,38 @@ export default class PDFCreator {
      * Size of PDF depending on input format.
      * @type {Size}
      */
-    this.pdfSize = pdfCreatorOptions.orientation === OrientationOptions.PORTRAIT ?
-      { width: pageSizes[pdfCreatorOptions.format][0], height: pageSizes[pdfCreatorOptions.format][1] } :
-      { width: pageSizes[pdfCreatorOptions.format][1], height: pageSizes[pdfCreatorOptions.format][0] };
+    this.pdfSize =
+      pdfCreatorOptions.orientation === OrientationOptions.PORTRAIT
+        ? {
+            width: pageSizes[pdfCreatorOptions.format][0],
+            height: pageSizes[pdfCreatorOptions.format][1],
+          }
+        : {
+            width: pageSizes[pdfCreatorOptions.format][1],
+            height: pageSizes[pdfCreatorOptions.format][0],
+          };
     /**
      * The line width where content can be added (excluding margins).
      * @type {number}
      */
-    this.maxLineWidth = this.pdfSize.width - this.formatting.pageMargins[1] - this.formatting.pageMargins[3];
+    this.maxLineWidth =
+      this.pdfSize.width -
+      this.formatting.pageMargins[1] -
+      this.formatting.pageMargins[3];
 
     /**
      * the jsPDF instance for creating the PDF and adding content.
      * @type {jsPDF}
      */
     // eslint-disable-next-line new-cap
-    this.pdfDoc = new jsPDF(pdfCreatorOptions.orientation, 'in', pdfCreatorOptions.format);
+    this.pdfDoc = new jsPDF(
+      pdfCreatorOptions.orientation,
+      'in',
+      pdfCreatorOptions.format,
+    );
 
     if (pdfCreatorOptions.fonts) {
-      this.font = await this
-        ._addFonts(pdfCreatorOptions.fonts);
+      this.font = await this._addFonts(pdfCreatorOptions.fonts);
     } else {
       this.font = 'helvetica';
     }
@@ -89,11 +108,17 @@ export default class PDFCreator {
     this.orientation = pdfCreatorOptions.orientation;
 
     if (pdfCreatorOptions.title) {
-      const width = this._calcElementWidth(this.formatting[`title.widthPortion.${pdfCreatorOptions.orientation}`]);
-      const maxLineCount = this.formatting[`title.maxLineCount.${this.orientation}`];
+      const width = this._calcElementWidth(
+        this.formatting[`title.widthPortion.${pdfCreatorOptions.orientation}`],
+      );
+      const maxLineCount =
+        this.formatting[`title.maxLineCount.${this.orientation}`];
 
       this._setTextStyle('title');
-      const titleArray = this.pdfDoc.splitTextToSize(pdfCreatorOptions.title, width);
+      const titleArray = this.pdfDoc.splitTextToSize(
+        pdfCreatorOptions.title,
+        width,
+      );
       /**
        * The title string of the pdf splitted according to line length.
        * Each element of array is new line.
@@ -155,16 +180,22 @@ export default class PDFCreator {
       /** width of discription text field */
       let width = this.maxLineWidth;
       if (pdfCreatorOptions.orientation === OrientationOptions.LANDSCAPE) {
-        if (this.contact && this.mapInfo) { // both info elems
+        if (this.contact && this.mapInfo) {
+          // both info elems
           width *= 1 - 2 * this.formatting['info.widthPortion.landscape'];
-        } else if (!this.contact !== !this.mapInfo) { // xor -> only one
+        } else if (!this.contact !== !this.mapInfo) {
+          // xor -> only one
           width *= 1 - this.formatting['info.widthPortion.landscape'];
         }
       }
-      const maxLineCount = this.formatting[`description.maxLineCount.${this.orientation}`];
+      const maxLineCount =
+        this.formatting[`description.maxLineCount.${this.orientation}`];
 
       this._setTextStyle('description');
-      const descriptionArray = this.pdfDoc.splitTextToSize(pdfCreatorOptions.description, width);
+      const descriptionArray = this.pdfDoc.splitTextToSize(
+        pdfCreatorOptions.description,
+        width,
+      );
       /**
        * The description string of the pdf splitted according to line length.
        * Each element of array is new line.
@@ -197,9 +228,15 @@ export default class PDFCreator {
    */
   _setTextStyle(textElement) {
     this.pdfDoc
-      .setFont(this.font, 'normal', this.formatting[`${textElement}.fontWeight`] || FontWeights.REGULAR)
+      .setFont(
+        this.font,
+        'normal',
+        this.formatting[`${textElement}.fontWeight`] || FontWeights.REGULAR,
+      )
       .setFontSize(this.formatting[`${textElement}.fontSize`] || 11)
-      .setLineHeightFactor(this.formatting[`${textElement}.lineHeight`] || 1.15);
+      .setLineHeightFactor(
+        this.formatting[`${textElement}.lineHeight`] || 1.15,
+      );
   }
 
   /**
@@ -235,14 +272,17 @@ export default class PDFCreator {
       coords: {
         x: this.formatting.pageMargins[3],
         // margin + half of the space that is added to font size by lineheight
-        y: this.formatting.pageMargins[0] + this._calcTotalLineHeight(maxLineCount) / 2 -
-        this._calcTotalLineHeight(this.title.length) / 2,
+        y:
+          this.formatting.pageMargins[0] +
+          this._calcTotalLineHeight(maxLineCount) / 2 -
+          this._calcTotalLineHeight(this.title.length) / 2,
       },
       size: {
         width,
         // lower border depends only on maxLineCount, not on title line number
-        height: this._calcTotalLineHeight(maxLineCount) / 2 +
-        this._calcTotalLineHeight(this.title.length) / 2,
+        height:
+          this._calcTotalLineHeight(maxLineCount) / 2 +
+          this._calcTotalLineHeight(this.title.length) / 2,
       },
     };
   }
@@ -254,12 +294,21 @@ export default class PDFCreator {
    */
   _calcLogoPlacement() {
     const aspectRatio = this.logo.width / this.logo.height;
-    const printHeight = this._calcTotalLineHeight(this.formatting['logo.scale']);
+    const printHeight = this._calcTotalLineHeight(
+      this.formatting['logo.scale'],
+    );
     return {
       coords: {
-        x: this.pdfSize.width - this.formatting.pageMargins[3] - printHeight * aspectRatio,
-        y: this.formatting.pageMargins[0] +
-          this._calcTotalLineHeight(this.formatting[`title.maxLineCount.${this.orientation}`]) / 2 -
+        x:
+          this.pdfSize.width -
+          this.formatting.pageMargins[3] -
+          printHeight * aspectRatio,
+        y:
+          this.formatting.pageMargins[0] +
+          this._calcTotalLineHeight(
+            this.formatting[`title.maxLineCount.${this.orientation}`],
+          ) /
+            2 -
           printHeight / 2,
       },
       size: {
@@ -279,13 +328,19 @@ export default class PDFCreator {
       coords: {
         x: this.formatting.pageMargins[3],
         // +1 for title of contact.
-        y: this.pdfSize.height - this.formatting.pageMargins[2] -
+        y:
+          this.pdfSize.height -
+          this.formatting.pageMargins[2] -
           this._calcTotalLineHeight(Object.keys(contactKeysPattern).length + 1),
       },
       size: {
         // +1 for title of contact.
-        width: this._calcElementWidth(this.formatting[`info.widthPortion.${this.orientation}`]),
-        height: this._calcTotalLineHeight(Object.keys(contactKeysPattern).length + 1),
+        width: this._calcElementWidth(
+          this.formatting[`info.widthPortion.${this.orientation}`],
+        ),
+        height: this._calcTotalLineHeight(
+          Object.keys(contactKeysPattern).length + 1,
+        ),
       },
     };
   }
@@ -297,20 +352,31 @@ export default class PDFCreator {
    * @private
    */
   _calcMapInfoPlacement() {
-    const xMargin = this.orientation === OrientationOptions.PORTRAIT ?
-      this.formatting.elementMargin : this.formatting.elementMargin / 2;
+    const xMargin =
+      this.orientation === OrientationOptions.PORTRAIT
+        ? this.formatting.elementMargin
+        : this.formatting.elementMargin / 2;
     return {
       coords: {
-        x: this.contact ? this.contactPlacement.coords.x + this.contactPlacement.size.width + xMargin :
-          this.formatting.pageMargins[3],
+        x: this.contact
+          ? this.contactPlacement.coords.x +
+            this.contactPlacement.size.width +
+            xMargin
+          : this.formatting.pageMargins[3],
         // +1 for title of contact.
-        y: this.pdfSize.height - this.formatting.pageMargins[2] -
+        y:
+          this.pdfSize.height -
+          this.formatting.pageMargins[2] -
           this._calcTotalLineHeight(Object.keys(contactKeysPattern).length + 1),
       },
       size: {
         // +1 for title of map info.
-        width: this._calcElementWidth(this.formatting[`info.widthPortion.${this.orientation}`]),
-        height: this._calcTotalLineHeight(Object.keys(contactKeysPattern).length + 1),
+        width: this._calcElementWidth(
+          this.formatting[`info.widthPortion.${this.orientation}`],
+        ),
+        height: this._calcTotalLineHeight(
+          Object.keys(contactKeysPattern).length + 1,
+        ),
       },
     };
   }
@@ -327,13 +393,19 @@ export default class PDFCreator {
     let height;
     let x;
     if (this.orientation === OrientationOptions.PORTRAIT) {
-      lowerBorder = (this.contactPlacement?.coords.y ?? this.mapInfoPlacement?.coords.y) ??
+      lowerBorder =
+        this.contactPlacement?.coords.y ??
+        this.mapInfoPlacement?.coords.y ??
         this.pdfSize.height - this.formatting.pageMargins[2];
-      height = this._calcTotalLineHeight(this.description.length) + this.formatting.elementMargin;
+      height =
+        this._calcTotalLineHeight(this.description.length) +
+        this.formatting.elementMargin;
       x = this.formatting.pageMargins[3];
     } else if (this.orientation === OrientationOptions.LANDSCAPE) {
       lowerBorder = this.pdfSize.height - this.formatting.pageMargins[2];
-      height = (this.contactPlacement?.size.height ?? this.mapInfoPlacement?.size.height) ??
+      height =
+        this.contactPlacement?.size.height ??
+        this.mapInfoPlacement?.size.height ??
         this._calcTotalLineHeight(this.description.length);
       x = this.pdfSize.width - this.formatting.pageMargins[1] - width;
     }
@@ -360,19 +432,28 @@ export default class PDFCreator {
   _calcImagePlacement(aspectRatio) {
     let upperBorder;
     if (this.title) {
-      upperBorder = this.titlePlacement.coords.y + this.titlePlacement.size.height + this.formatting.elementMargin;
+      upperBorder =
+        this.titlePlacement.coords.y +
+        this.titlePlacement.size.height +
+        this.formatting.elementMargin;
     } else if (this.logo) {
-      upperBorder = this.logoPlacement.coords.y + this.logoPlacement.size.height + this.formatting.elementMargin;
+      upperBorder =
+        this.logoPlacement.coords.y +
+        this.logoPlacement.size.height +
+        this.formatting.elementMargin;
     } else {
       upperBorder = this.formatting.pageMargins[0];
     }
     let lowerBorder;
     if (this.description) {
-      lowerBorder = this.descriptionPlacement.coords.y - this.formatting.elementMargin;
+      lowerBorder =
+        this.descriptionPlacement.coords.y - this.formatting.elementMargin;
     } else if (this.contact) {
-      lowerBorder = this.contactPlacement.coords.y - this.formatting.elementMargin;
+      lowerBorder =
+        this.contactPlacement.coords.y - this.formatting.elementMargin;
     } else if (this.mapInfo) {
-      lowerBorder = this.mapInfoPlacement.coords.y - this.formatting.elementMargin;
+      lowerBorder =
+        this.mapInfoPlacement.coords.y - this.formatting.elementMargin;
     } else {
       lowerBorder = this.formatting.pageMargins[2];
     }
@@ -410,15 +491,29 @@ export default class PDFCreator {
    */
   async create(canvas) {
     if (!this.initialized) {
-      throw new Error('pdfCreator instance needs first to be initialized by calling init method.');
+      throw new Error(
+        'pdfCreator instance needs first to be initialized by calling init method.',
+      );
     }
 
     if (this.title) {
       this._setTextStyle('title');
-      this.pdfDoc.text(this.title, this.titlePlacement.coords.x, this.titlePlacement.coords.y, { baseline: 'top' });
+      this.pdfDoc.text(
+        this.title,
+        this.titlePlacement.coords.x,
+        this.titlePlacement.coords.y,
+        { baseline: 'top' },
+      );
     }
 
-    this.pdfDoc.addImage(canvas, 'JPEG', this.imgPlacement.coords.x, this.imgPlacement.coords.y, this.imgPlacement.size.width, this.imgPlacement.size.height);
+    this.pdfDoc.addImage(
+      canvas,
+      'JPEG',
+      this.imgPlacement.coords.x,
+      this.imgPlacement.coords.y,
+      this.imgPlacement.size.width,
+      this.imgPlacement.size.height,
+    );
 
     if (this.logo) {
       this.pdfDoc.addImage(
@@ -433,25 +528,57 @@ export default class PDFCreator {
     if (this.contact) {
       this._setTextStyle('info');
       // -1 line height in y because of contact header
-      this.pdfDoc.text(this.contact.text, this.contactPlacement.coords.x, this.contactPlacement.coords.y + this._calcTotalLineHeight(1), { baseline: 'hanging' });
+      this.pdfDoc.text(
+        this.contact.text,
+        this.contactPlacement.coords.x,
+        this.contactPlacement.coords.y + this._calcTotalLineHeight(1),
+        { baseline: 'hanging' },
+      );
       this.pdfDoc.setFont(this.font, 'normal', FontWeights.BOLD);
-      this.pdfDoc.text(this.contact.header, this.contactPlacement.coords.x, this.contactPlacement.coords.y, { baseline: 'hanging' });
+      this.pdfDoc.text(
+        this.contact.header,
+        this.contactPlacement.coords.x,
+        this.contactPlacement.coords.y,
+        { baseline: 'hanging' },
+      );
     }
 
     if (this.mapInfo) {
       this._setTextStyle('info');
       // -1 line height in y because of map info header
-      this.pdfDoc.text(this.mapInfo.text, this.mapInfoPlacement.coords.x, this.mapInfoPlacement.coords.y + this._calcTotalLineHeight(1), { baseline: 'hanging' });
+      this.pdfDoc.text(
+        this.mapInfo.text,
+        this.mapInfoPlacement.coords.x,
+        this.mapInfoPlacement.coords.y + this._calcTotalLineHeight(1),
+        { baseline: 'hanging' },
+      );
       this.pdfDoc.setFont(this.font, 'normal', FontWeights.BOLD);
-      this.pdfDoc.text(this.mapInfo.header, this.mapInfoPlacement.coords.x, this.mapInfoPlacement.coords.y, { baseline: 'hanging' });
+      this.pdfDoc.text(
+        this.mapInfo.header,
+        this.mapInfoPlacement.coords.x,
+        this.mapInfoPlacement.coords.y,
+        { baseline: 'hanging' },
+      );
     }
 
     if (this.description) {
       this._setTextStyle('description');
       if (this.orientation === OrientationOptions.PORTRAIT) {
-        this.pdfDoc.text(this.description, this.descriptionPlacement.coords.x, this.imgPlacement.coords.y + this.imgPlacement.size.height + this.formatting.elementMargin, { baseline: 'hanging' });
+        this.pdfDoc.text(
+          this.description,
+          this.descriptionPlacement.coords.x,
+          this.imgPlacement.coords.y +
+            this.imgPlacement.size.height +
+            this.formatting.elementMargin,
+          { baseline: 'hanging' },
+        );
       } else {
-        this.pdfDoc.text(this.description, this.descriptionPlacement.coords.x, this.descriptionPlacement.coords.y, { baseline: 'hanging' });
+        this.pdfDoc.text(
+          this.description,
+          this.descriptionPlacement.coords.x,
+          this.descriptionPlacement.coords.y,
+          { baseline: 'hanging' },
+        );
       }
     }
 
@@ -473,7 +600,7 @@ export default class PDFCreator {
      * @param {jsPDF} pdfDoc The pdfDoc instance.
      */
     async function addFont(name, fontPath, fontWeight, pdfDoc) {
-      const font = await fetch(fontPath).then(response => response.blob());
+      const font = await fetch(fontPath).then((response) => response.blob());
       const base64url = await new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);

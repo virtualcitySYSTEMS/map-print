@@ -1,7 +1,9 @@
 import { ButtonLocation, createToggleAction, WindowSlot } from '@vcmap/ui';
 import { version, name } from '../package.json';
 import PdfWindow, { pdfWindowId } from './pdf/pdfWindow.vue';
-import ScreenshotWindow, { screenshotWindowId } from './screenshot/screenshotWindow.vue';
+import ScreenshotWindow, {
+  screenshotWindowId,
+} from './screenshot/screenshotWindow.vue';
 import { getSetupAndState } from './common/configManager.js';
 import getDefaultConfig from './defaultConfig.js';
 
@@ -10,11 +12,18 @@ import getDefaultConfig from './defaultConfig.js';
  * @returns {Object}
  */
 export default (config) => {
-  const { pluginSetup, pluginState } = getSetupAndState(config, getDefaultConfig());
+  const { pluginSetup, pluginState } = getSetupAndState(
+    config,
+    getDefaultConfig(),
+  );
 
   return {
-    get name() { return name; },
-    get version() { return version; },
+    get name() {
+      return name;
+    },
+    get version() {
+      return version;
+    },
     config: pluginSetup,
     state: pluginState,
     onVcsAppMounted: async (vcsUiApp) => {
@@ -78,7 +87,8 @@ export default (config) => {
             portrait: 'Hochformat',
             landscape: 'Querformat',
             titlePlaceholder: 'Hier Titel einfügen',
-            descriptionPlaceholder: 'Hier Beschreibung einfügen, kann mehrzeilig sein',
+            descriptionPlaceholder:
+              'Hier Beschreibung einfügen, kann mehrzeilig sein',
             createButton: 'Erstellen',
             content: {
               contact: {
@@ -88,7 +98,7 @@ export default (config) => {
                 fax: 'Fax',
               },
               mapInfo: 'Karten Information',
-              coordinates: 'Koordinaten',
+              centerCoordinate: 'Mittelpunkt (WGS84)',
             },
           },
           image: {
@@ -119,7 +129,7 @@ export default (config) => {
                 fax: 'Fax',
               },
               mapInfo: 'Map Information',
-              coordinates: 'Coordinates',
+              centerCoordinate: 'Center (WGS84)',
             },
           },
           image: {

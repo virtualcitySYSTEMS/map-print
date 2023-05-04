@@ -1,20 +1,10 @@
 <template>
   <div>
-    <v-overlay
-      :value="running"
-      absolute
-      :opacity="1"
-      color="basic"
-    >
-      <v-icon x-large color="primary">
-        $vcsProgress
-      </v-icon>
+    <v-overlay :value="running" absolute :opacity="1" color="basic">
+      <v-icon x-large color="primary"> $vcsProgress </v-icon>
     </v-overlay>
     <v-container class="py-0 px-1">
-      <v-row
-        no-gutters
-        align="center"
-      >
+      <v-row no-gutters align="center">
         <v-col cols="7">
           <VcsLabel html-for="sizeSelect" :dense="true">
             {{ $t('print.pdf.format') }}
@@ -29,10 +19,7 @@
           />
         </v-col>
       </v-row>
-      <v-row
-        no-gutters
-        align="center"
-      >
+      <v-row no-gutters align="center">
         <v-col cols="7">
           <VcsLabel html-for="ppiSelect" :dense="true">
             {{ $t('print.pdf.resolution') }}
@@ -56,17 +43,16 @@
           v-model="pluginState.selectedOrientation"
           mandatory
           row
-          :items="[{label: $t('print.pdf.portrait'), value: 'portrait'},
-                   {label: $t('print.pdf.landscape'), value: 'landscape'}]"
+          :items="[
+            { label: $t('print.pdf.portrait'), value: 'portrait' },
+            { label: $t('print.pdf.landscape'), value: 'landscape' },
+          ]"
         />
       </v-row>
     </v-container>
     <v-divider />
     <v-container class="py-0 px-1">
-      <v-row
-        no-gutters
-        align="center"
-      >
+      <v-row no-gutters align="center">
         <v-col>
           <VcsTextField
             :dense="true"
@@ -77,10 +63,7 @@
           />
         </v-col>
       </v-row>
-      <v-row
-        no-gutters
-        align="center"
-      >
+      <v-row no-gutters align="center">
         <v-col>
           <VcsTextArea
             :placeholder="$t('print.pdf.descriptionPlaceholder')"
@@ -93,25 +76,30 @@
       </v-row>
     </v-container>
     <v-divider />
-    <div class="d-flex flex-row-reverse justify-space-between">
-      <VcsButton class="py-2 px-2" color="primary" @click="createPdf()">
+    <div class="d-flex w-full justify-end px-2 pt-2 pb-1">
+      <VcsFormButton @click="createPdf()" variant="filled">
         <span class="text-uppercase">
           {{ $t('print.pdf.createButton') }}
         </span>
-      </VcsButton>
+      </VcsFormButton>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
 
 <script>
   // @ts-check
 
   import { inject, ref } from 'vue';
   import {
-    VcsSelect, VcsTextField, VcsTextArea, VcsLabel, VcsButton, VcsRadio, getPluginAssetUrl,
+    VcsSelect,
+    VcsTextField,
+    VcsTextArea,
+    VcsLabel,
+    VcsFormButton,
+    VcsRadio,
+    getPluginAssetUrl,
   } from '@vcmap/ui';
   import {
     VOverlay,
@@ -135,7 +123,7 @@
       VcsSelect,
       VcsTextField,
       VcsLabel,
-      VcsButton,
+      VcsFormButton,
       VcsTextArea,
       VcsRadio,
       VOverlay,
@@ -181,8 +169,16 @@
         // could also be put into styles.js
         const fonts = {
           name: 'RobotoSlab',
-          regular: getPluginAssetUrl(app, name, 'plugin-assets/fonts/RobotoSlab-Regular.ttf'),
-          bold: getPluginAssetUrl(app, name, 'plugin-assets/fonts/RobotoSlab-Bold.ttf'),
+          regular: getPluginAssetUrl(
+            app,
+            name,
+            'plugin-assets/fonts/RobotoSlab-Regular.ttf',
+          ),
+          bold: getPluginAssetUrl(
+            app,
+            name,
+            'plugin-assets/fonts/RobotoSlab-Bold.ttf',
+          ),
         };
 
         const mapAspectRatio = getMapAspectRatio(app.maps.activeMap);
@@ -200,8 +196,15 @@
           fonts,
         });
         // after setup possible to execute pdfCreator.create()
-        const width = pdfCreator.imgPlacement.size.width * pluginState.selectedPpi;
-        await createAndHandleBlob(app, running, width, pdfCreator.create.bind(pdfCreator), 'map.pdf');
+        const width =
+          pdfCreator.imgPlacement.size.width * pluginState.selectedPpi;
+        await createAndHandleBlob(
+          app,
+          running,
+          width,
+          pdfCreator.create.bind(pdfCreator),
+          'map.pdf',
+        );
       }
 
       return {

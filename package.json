@@ -10,7 +10,10 @@
     "start": "vcmplugin serve",
     "preview": "vcmplugin preview",
     "buildStagingApp": "vcmplugin buildStagingApp",
-    "lint": "eslint \"{src,tests}/**/*.{js,vue}\""
+    "lint:js": "eslint . --ext .vue,.js,.cjs,.mjs,.ts,.cts,.mts",
+    "lint:prettier": "prettier --check .",
+    "lint": "npm run lint:js && npm run lint:prettier",
+    "format": "prettier --write --list-different . && npm run lint:js -- --fix"
   },
   "author": "Virtual City Systems",
   "license": "MIT",
@@ -36,12 +39,13 @@
     "root": true,
     "extends": "@vcsuite/eslint-config/vue"
   },
+  "prettier": "@vcsuite/eslint-config/prettier.js",
   "dependencies": {
     "jspdf": "^2.5.1"
   },
   "peerDependencies": {
-    "@vcmap/core": "~5.0.0-rc.27",
-    "@vcmap/ui": "^5.0.0-rc.22",
+    "@vcmap/core": "^5.0.0-rc.31",
+    "@vcmap/ui": "^5.0.0-rc.24",
     "@vcsuite/check": "^1.1.2",
     "@vcsuite/logger": "^1.0.1",
     "@vcsuite/parsers": "^1.0.1",
@@ -49,7 +53,7 @@
     "vuetify": "~2.6.7"
   },
   "devDependencies": {
-    "@vcmap/plugin-cli": "^2.1.4",
-    "@vcsuite/eslint-config": "^2.1.1"
+    "@vcmap/plugin-cli": "^2.1.8",
+    "@vcsuite/eslint-config": "^3.0.3"
   }
 }

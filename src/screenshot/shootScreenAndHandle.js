@@ -1,4 +1,5 @@
-import { sleep, downloadURI } from '../common/util.js';
+import { downloadURI } from '@vcmap/ui';
+import { sleep } from '../common/util.js';
 import { renderScreenshot } from './screenshotCreator.js';
 
 /**
@@ -9,7 +10,13 @@ import { renderScreenshot } from './screenshotCreator.js';
  * @param {Function} createBlob Function for creating a blob.
  * @param {string} fileName Name of the file that is downloaded.
  */
-export default async function createAndHandleBlob(app, runState, width, createBlob, fileName) {
+export default async function createAndHandleBlob(
+  app,
+  runState,
+  width,
+  createBlob,
+  fileName,
+) {
   runState.value = true;
   await sleep();
   const canvas = await renderScreenshot(app, width);

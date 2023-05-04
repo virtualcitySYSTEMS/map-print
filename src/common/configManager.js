@@ -69,23 +69,36 @@ export const contactKeysPattern = {
  */
 export function getSetupAndState(pluginConfig, defaultConfig) {
   // perform validation
-  pluginConfig.formatList?.every(value => check(value, Object.keys(standardPageSizes)));
-  checkMaybe(pluginConfig.formatDefault, pluginConfig.formatList || defaultConfig.formatList);
-  pluginConfig.ppiList?.every(value => check(value, Number));
-  checkMaybe(pluginConfig.ppiDefault, pluginConfig.ppiList || defaultConfig.ppiList);
-  checkMaybe(pluginConfig.orientationOptions, Object.values(OrientationOptions));
-  checkMaybe(pluginConfig.orientationDefault, Object.values(OrientationOptions).filter(value => value !== 'both'));
+  pluginConfig.formatList?.every((value) =>
+    check(value, Object.keys(standardPageSizes)),
+  );
+  checkMaybe(
+    pluginConfig.formatDefault,
+    pluginConfig.formatList || defaultConfig.formatList,
+  );
+  pluginConfig.ppiList?.every((value) => check(value, Number));
+  checkMaybe(
+    pluginConfig.ppiDefault,
+    pluginConfig.ppiList || defaultConfig.ppiList,
+  );
+  checkMaybe(
+    pluginConfig.orientationOptions,
+    Object.values(OrientationOptions),
+  );
+  checkMaybe(
+    pluginConfig.orientationDefault,
+    Object.values(OrientationOptions).filter((value) => value !== 'both'),
+  );
   checkMaybe(pluginConfig.allowTitle, Boolean);
   checkMaybe(pluginConfig.allowDescription, Boolean);
   checkMaybe(pluginConfig.printLogo, Boolean);
   checkMaybe(pluginConfig.printMapInfo, Boolean);
-  pluginConfig.resolutionList?.every(value => check(value, Number));
+  pluginConfig.resolutionList?.every((value) => check(value, Number));
   checkMaybe(
     pluginConfig.resolutionDefault || defaultConfig.resolutionDefault,
     pluginConfig.resolutionList || defaultConfig.resolutionList,
   );
   checkMaybe(pluginConfig.contactDetails, contactKeysPattern, true);
-
 
   /**
    * available format list;
@@ -100,7 +113,8 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    * @type {string}
    * @example 'A4'
    */
-  const formatDefault = pluginConfig.formatDefault || defaultConfig.formatDefault;
+  const formatDefault =
+    pluginConfig.formatDefault || defaultConfig.formatDefault;
 
   /**
    * available values for pixel per inch (PPI)
@@ -120,56 +134,77 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    * @type {string}
    * @example "both"
    */
-  const orientationOptions =
-    parseEnumValue(pluginConfig.orientationOptions, OrientationOptions, defaultConfig.orientationOptions);
+  const orientationOptions = parseEnumValue(
+    pluginConfig.orientationOptions,
+    OrientationOptions,
+    defaultConfig.orientationOptions,
+  );
 
   /**
    * @type {string}
    * @example "landscape"
    */
   const orientationDefault =
-    orientationOptions !== OrientationOptions.BOTH ?
-      // if the OrientationOption is not BOTH, the default orientation equals the OrientationOption
-      orientationOptions :
-      parseEnumValue(pluginConfig.orientationDefault, OrientationOptions, defaultConfig.orientationDefault);
+    orientationOptions !== OrientationOptions.BOTH
+      ? // if the OrientationOption is not BOTH, the default orientation equals the OrientationOption
+        orientationOptions
+      : parseEnumValue(
+          pluginConfig.orientationDefault,
+          OrientationOptions,
+          defaultConfig.orientationDefault,
+        );
 
   /**
    * Whether the user should be able to add title or not.
    * @type {boolean}
    */
-  const allowTitle = parseBoolean(pluginConfig.allowTitle, defaultConfig.allowTitle);
+  const allowTitle = parseBoolean(
+    pluginConfig.allowTitle,
+    defaultConfig.allowTitle,
+  );
 
   /**
    * Whether the user should be able to add description or not.
    * @type {boolean}
    */
-  const allowDescription = parseBoolean(pluginConfig.allowDescription, defaultConfig.allowDescription);
+  const allowDescription = parseBoolean(
+    pluginConfig.allowDescription,
+    defaultConfig.allowDescription,
+  );
 
   /**
    * Whether logo should be printed on pdf or not.
    * @type {boolean}
    */
-  const printLogo = parseBoolean(pluginConfig.printLogo, defaultConfig.printLogo);
+  const printLogo = parseBoolean(
+    pluginConfig.printLogo,
+    defaultConfig.printLogo,
+  );
 
   /**
    * Whether map information should be printed on pdf or not.
    * @type {boolean}
    */
-  const printMapInfo = parseBoolean(pluginConfig.printMapInfo, defaultConfig.printMapInfo);
+  const printMapInfo = parseBoolean(
+    pluginConfig.printMapInfo,
+    defaultConfig.printMapInfo,
+  );
 
   // screenshot
   /**
    * Available resolutions for screenshot. The value is always the longest side of the image.
    * @type {Array<number>}
    */
-  const resolutionList = pluginConfig.resolutionList || defaultConfig.resolutionList;
+  const resolutionList =
+    pluginConfig.resolutionList || defaultConfig.resolutionList;
 
   /**
    * The default resolution
    * @type {number}
    * @example 1920
    */
-  const resolutionDefault = pluginConfig.resolutionDefault || defaultConfig.resolutionDefault;
+  const resolutionDefault =
+    pluginConfig.resolutionDefault || defaultConfig.resolutionDefault;
 
   /**
    * The contact information to be printed on pdf
@@ -182,7 +217,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
     // setup configuration of the plugin
     pluginSetup: {
       formatList,
-      ppiList: ppiList.map(value => ({ value, text: `${value} ppi` })),
+      ppiList: ppiList.map((value) => ({ value, text: `${value} ppi` })),
       orientationOptions,
       allowTitle,
       allowDescription,

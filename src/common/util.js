@@ -11,20 +11,6 @@ export async function sleep() {
 }
 
 /**
- * Downloads a file.
- * @param {string} path Path to the file.
- * @param {string} fileName name that is assigned to the file.
- */
-export function downloadURI(path, fileName) {
-  const link = document.createElement('a');
-  link.download = fileName;
-  link.href = path;
-  link.target = '_blank';
-  link.click();
-  link.remove();
-}
-
-/**
  * Convert svg image to png.
  * @param {string} svgPath The path to the svg image.
  * @param {number} height Height in pixels of the resulting png.
@@ -61,7 +47,9 @@ export function getMapAspectRatio(map) {
   if (map instanceof CesiumMap) {
     ({ width, height } = map.getCesiumWidget().scene.canvas);
   } else if (map instanceof OpenlayersMap || map instanceof ObliqueMap) {
-    ({ width, height } = Array.from(map.olMap.getViewport().querySelectorAll('.ol-layer canvas')).reduce((acc, val) => (acc.width > val.width ? val : acc)));
+    ({ width, height } = Array.from(
+      map.olMap.getViewport().querySelectorAll('.ol-layer canvas'),
+    ).reduce((acc, val) => (acc.width > val.width ? val : acc)));
   } else {
     throw new Error('map not supported');
   }

@@ -50,7 +50,6 @@ function prepareOlMap(map, renderSize) {
   };
 }
 
-
 /**
  * copies cesium content on the given canvas
  * @param {import("@vcmap/core").CesiumMap} map
@@ -86,18 +85,28 @@ async function getImageFromOpenlayers(map, canvasSize) {
   await new Promise((resolve) => {
     olMap.once('rendercomplete', () => {
       /** @type {Array<HTMLCanvasElement>} */
-      const olLayerCanvasList = /** @type {Array<HTMLCanvasElement>} */ Array.from(olMap.getViewport().querySelectorAll('.ol-layer canvas'));
+      const olLayerCanvasList =
+        /** @type {Array<HTMLCanvasElement>} */ Array.from(
+          olMap.getViewport().querySelectorAll('.ol-layer canvas'),
+        );
       olLayerCanvasList.forEach((layerCanvas) => {
         if (layerCanvas.width > 0) {
-          const { opacity } = /** @type {HTMLElement} */ (layerCanvas.parentNode).style;
+          const { opacity } = /** @type {HTMLElement} */ (
+            layerCanvas.parentNode
+          ).style;
           canvasContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
           const { transform } = layerCanvas.style;
           /** @type {DOMMatrix2DInit} */
-          const matrix = /** @type {DOMMatrix2DInit} */(transform
-            .match(/^matrix\(([^(]*)\)$/)[1]
-            .split(',')
-            .map(Number));
+          const matrix = /** @type {DOMMatrix2DInit} */ (
+            transform
+              .match(/^matrix\(([^(]*)\)$/)[1]
+              .split(',')
+              .map(Number)
+          );
           canvasContext.setTransform(...matrix);
+          // fill canvas with white so transparent pixels are not printed as black when exporting as jpeg.
+          canvasContext.fillStyle = 'white';
+          canvasContext.fillRect(0, 0, canvas.width, canvas.height);
           canvasContext.drawImage(layerCanvas, 0, 0);
         }
       });
@@ -106,7 +115,6 @@ async function getImageFromOpenlayers(map, canvasSize) {
   });
   return canvas;
 }
-
 
 /**
  * Renders Screenshot of the currently active map with all active Layers in a given pixel width.
@@ -156,15 +164,21 @@ export async function renderScreenshot(app, width) {
   const map = app.maps.activeMap;
 
   if (map instanceof CesiumMap) {
-    const mapSize = ['width', 'height'].map(dimension => map.getCesiumWidget().scene.canvas[dimension]);
+    const mapSize = ['width', 'height'].map(
+      (dimension) => map.getCesiumWidget().scene.canvas[dimension],
+    );
     // check if render size is above chromium threshold
     checkChromeMaxPixel(calcRenderSize(mapSize, width), 33000000);
     const scale = width / mapSize[0];
     resetMap = prepareCesiumMap(map, scale);
     screenshotCanvas = await getImageFromCesium(map);
   } else if (map instanceof OpenlayersMap || map instanceof ObliqueMap) {
-    const biggestCanvas = Array.from(map.olMap.getViewport().querySelectorAll('.ol-layer canvas')).reduce((acc, val) => (acc.width > val.width ? val : acc));
-    const mapSize = ['width', 'height'].map(dimension => biggestCanvas[dimension]);
+    const biggestCanvas = Array.from(
+      map.olMap.getViewport().querySelectorAll('.ol-layer canvas'),
+    ).reduce((acc, val) => (acc.width > val.width ? val : acc));
+    const mapSize = ['width', 'height'].map(
+      (dimension) => biggestCanvas[dimension],
+    );
     const renderSize = calcRenderSize(mapSize, width);
     resetMap = prepareOlMap(map, renderSize);
     screenshotCanvas = await getImageFromOpenlayers(map, renderSize);
