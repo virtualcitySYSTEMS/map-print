@@ -80,8 +80,8 @@ export default (config) => {
       de: {
         print: {
           pdf: {
-            tooltip: 'PDF mit der aktuellen Ansicht erstellen.',
-            header: 'PDF Erstellen',
+            tooltip: 'PDF der aktuellen Ansicht erstellen',
+            header: 'PDF erstellen',
             format: 'Papierformat',
             resolution: 'Auflösung',
             portrait: 'Hochformat',
@@ -97,13 +97,13 @@ export default (config) => {
                 phone: 'Tel.',
                 fax: 'Fax',
               },
-              mapInfo: 'Karten Information',
+              mapInfo: 'Karteninformation',
               centerCoordinate: 'Mittelpunkt (WGS84)',
             },
           },
           image: {
-            tooltip: 'JPG mit der aktuellen Ansicht erstellen.',
-            header: 'JPG Erstellen',
+            tooltip: 'Bilddatei (JPG) der aktuellen Ansicht erstellen',
+            header: 'Bild erstellen',
             resolution: 'Auflösung',
             createButton: 'Erstellen',
           },
@@ -112,9 +112,9 @@ export default (config) => {
       en: {
         print: {
           pdf: {
-            tooltip: 'Create PDF of current view.',
+            tooltip: 'Create PDF of current view',
             header: 'Create PDF',
-            format: 'Paper Size',
+            format: 'Paper size',
             resolution: 'Resolution',
             portrait: 'Portrait',
             landscape: 'Landscape',
@@ -124,16 +124,16 @@ export default (config) => {
             content: {
               contact: {
                 header: 'Contact',
-                mail: 'E-Mail',
-                phone: 'Tel.',
+                mail: 'Email',
+                phone: 'Phone',
                 fax: 'Fax',
               },
-              mapInfo: 'Map Information',
+              mapInfo: 'Map information',
               centerCoordinate: 'Center (WGS84)',
             },
           },
           image: {
-            tooltip: 'Create JPG of current view.',
+            tooltip: 'Create image file (JPG) of current view',
             header: 'Create JPG',
             resolution: 'Resolution',
             createButton: 'Create',
