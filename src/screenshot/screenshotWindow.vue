@@ -4,7 +4,7 @@
       <v-icon x-large color="primary"> $vcsProgress </v-icon>
     </v-overlay>
     <v-container class="py-0 px-1">
-      <v-row no-gutters align="center">
+      <v-row no-gutters>
         <v-col cols="5">
           <VcsLabel html-for="sizeSelect" :dense="true">
             {{ $t('print.image.resolution') }}

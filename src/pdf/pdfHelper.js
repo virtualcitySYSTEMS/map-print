@@ -16,11 +16,17 @@ export function formatContactInfo(app, contactInfo) {
         const value = contactInfo[key];
         switch (key) {
           case 'mail':
-            return `${app.vueI18n.t('pdf.content.contact.mail')}: ${value}`;
+            return `${app.vueI18n.t(
+              'print.pdf.content.contact.mail',
+            )}: ${value}`;
           case 'phone':
-            return `${app.vueI18n.t('pdf.content.contact.phone')}: ${value}`;
+            return `${app.vueI18n.t(
+              'print.pdf.content.contact.phone',
+            )}: ${value}`;
           case 'fax':
-            return `${app.vueI18n.t('pdf.content.contact.fax')}: ${value}`;
+            return `${app.vueI18n.t(
+              'print.pdf.content.contact.fax',
+            )}: ${value}`;
           default:
             return value;
         }

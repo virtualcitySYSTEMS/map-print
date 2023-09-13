@@ -12,5 +12,6 @@ export default () => {
     printMapInfo: true,
     resolutionList: [500, 720, 1280, 1920, 3840],
     resolutionDefault: 1280,
+    contactDetails: undefined,
   };
 };

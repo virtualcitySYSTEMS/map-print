@@ -1,4 +1,4 @@
-import { CesiumMap, OpenlayersMap, ObliqueMap } from '@vcmap/core';
+import { CesiumMap, ObliqueMap, OpenlayersMap } from '@vcmap/core';
 import { getLogger } from '@vcsuite/logger';
 
 /**
@@ -134,8 +134,7 @@ export async function renderScreenshot(app, width) {
    */
   function calcRenderSize(mapSize, screenshotWidth) {
     const aspectRatio = mapSize[0] / mapSize[1];
-    const renderSize = [screenshotWidth, screenshotWidth / aspectRatio];
-    return renderSize;
+    return [screenshotWidth, screenshotWidth / aspectRatio];
   }
 
   /**

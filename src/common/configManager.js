@@ -1,6 +1,7 @@
 import { parseBoolean, parseEnumValue } from '@vcsuite/parsers';
 import { check, checkMaybe } from '@vcsuite/check';
 import { reactive } from 'vue';
+import { getLogger } from '@vcsuite/logger';
 import standardPageSizes from '../pdf/standardPageSizes.js';
 
 /**
@@ -45,7 +46,7 @@ export const contactKeysPattern = {
 };
 
 /**
- * @typedef {Object} printConfig Configuration options of the print plugin.
+ * @typedef {Object} PrintConfig Configuration options of the print plugin.
  * @property {Array<string>} formatList List of page formates the user can select from.
  * @property {string} formatDefault The default format. Needs to be in formatList.
  * @property {Array<number>} ppiList List of ppi values the user can select from.
@@ -62,51 +63,29 @@ export const contactKeysPattern = {
  */
 
 /**
- * Parses the default config as well as the custom map plugin config and merges them.
- * @param {printConfig} pluginConfig The config which is defined when setting up the map.
- * @param {printConfig} defaultConfig The default plugin config inside the source code of the plugin.
- * @returns {Object<string,Object<string,*>>} Setup config and state of the plugin.
+ * @typedef {Object} PrintState
+ * @property {string} selectedFormat
+ * @property {number} selectedPpi
+ * @property {string} selectedOrientation
+ * @property {string} title
+ * @property {string} description
+ * @property {number} selectedResolution
  */
-export function getSetupAndState(pluginConfig, defaultConfig) {
-  // perform validation
-  pluginConfig.formatList?.every((value) =>
-    check(value, Object.keys(standardPageSizes)),
-  );
-  checkMaybe(
-    pluginConfig.formatDefault,
-    pluginConfig.formatList || defaultConfig.formatList,
-  );
-  pluginConfig.ppiList?.every((value) => check(value, Number));
-  checkMaybe(
-    pluginConfig.ppiDefault,
-    pluginConfig.ppiList || defaultConfig.ppiList,
-  );
-  checkMaybe(
-    pluginConfig.orientationOptions,
-    Object.values(OrientationOptions),
-  );
-  checkMaybe(
-    pluginConfig.orientationDefault,
-    Object.values(OrientationOptions).filter((value) => value !== 'both'),
-  );
-  checkMaybe(pluginConfig.allowTitle, Boolean);
-  checkMaybe(pluginConfig.allowDescription, Boolean);
-  checkMaybe(pluginConfig.printLogo, Boolean);
-  checkMaybe(pluginConfig.printMapInfo, Boolean);
-  pluginConfig.resolutionList?.every((value) => check(value, Number));
-  checkMaybe(
-    pluginConfig.resolutionDefault || defaultConfig.resolutionDefault,
-    pluginConfig.resolutionList || defaultConfig.resolutionList,
-  );
-  checkMaybe(pluginConfig.contactDetails, contactKeysPattern, true);
 
+/**
+ * Parses the default config as well as the custom map plugin config and merges them.
+ * @param {PrintConfig} pluginConfig The config which is defined when setting up the map.
+ * @param {PrintConfig} defaultOptions The default plugin config inside the source code of the plugin.
+ * @returns {{pluginConfig: PrintConfig, pluginState: PrintState}} Setup config and state of the plugin.
+ */
+export function getConfigAndState(pluginConfig, defaultOptions) {
   /**
    * available format list;
    * @type {Array<string>}
    * @example ['A2', 'A3', 'A4', 'A5']
    * @api
    */
-  const formatList = pluginConfig.formatList || defaultConfig.formatList;
+  const formatList = pluginConfig.formatList || defaultOptions.formatList;
 
   /**
    * The default page format
@@ -114,21 +93,21 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    * @example 'A4'
    */
   const formatDefault =
-    pluginConfig.formatDefault || defaultConfig.formatDefault;
+    pluginConfig.formatDefault || defaultOptions.formatDefault;
 
   /**
    * available values for pixel per inch (PPI)
    * @type {Array<number>}
    * @example [75, 150, 300, 450, 600]
    */
-  const ppiList = pluginConfig.ppiList || defaultConfig.ppiList;
+  const ppiList = pluginConfig.ppiList || defaultOptions.ppiList;
 
   /**
    * The default value for pixel per inch (PPI)
    * @type {number}
    * @example 300
    */
-  const ppiDefault = pluginConfig.ppiDefault || defaultConfig.ppiDefault;
+  const ppiDefault = pluginConfig.ppiDefault || defaultOptions.ppiDefault;
 
   /**
    * @type {string}
@@ -137,7 +116,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
   const orientationOptions = parseEnumValue(
     pluginConfig.orientationOptions,
     OrientationOptions,
-    defaultConfig.orientationOptions,
+    defaultOptions.orientationOptions,
   );
 
   /**
@@ -151,7 +130,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
       : parseEnumValue(
           pluginConfig.orientationDefault,
           OrientationOptions,
-          defaultConfig.orientationDefault,
+          defaultOptions.orientationDefault,
         );
 
   /**
@@ -160,7 +139,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    */
   const allowTitle = parseBoolean(
     pluginConfig.allowTitle,
-    defaultConfig.allowTitle,
+    defaultOptions.allowTitle,
   );
 
   /**
@@ -169,7 +148,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    */
   const allowDescription = parseBoolean(
     pluginConfig.allowDescription,
-    defaultConfig.allowDescription,
+    defaultOptions.allowDescription,
   );
 
   /**
@@ -178,7 +157,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    */
   const printLogo = parseBoolean(
     pluginConfig.printLogo,
-    defaultConfig.printLogo,
+    defaultOptions.printLogo,
   );
 
   /**
@@ -187,7 +166,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    */
   const printMapInfo = parseBoolean(
     pluginConfig.printMapInfo,
-    defaultConfig.printMapInfo,
+    defaultOptions.printMapInfo,
   );
 
   // screenshot
@@ -196,7 +175,7 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    * @type {Array<number>}
    */
   const resolutionList =
-    pluginConfig.resolutionList || defaultConfig.resolutionList;
+    pluginConfig.resolutionList || defaultOptions.resolutionList;
 
   /**
    * The default resolution
@@ -204,28 +183,33 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
    * @example 1920
    */
   const resolutionDefault =
-    pluginConfig.resolutionDefault || defaultConfig.resolutionDefault;
+    pluginConfig.resolutionDefault || defaultOptions.resolutionDefault;
 
   /**
    * The contact information to be printed on pdf
    * @type {ContactInfo}
    * @example ['Virtual City Systems', 'Tauentzienstr. 7 b/c', '10789 Berlin', 'Germany', 'Tel.: +49 30 89048710']
    */
-  const contact = pluginConfig.contactDetails || undefined;
+  const contactDetails =
+    pluginConfig.contactDetails || defaultOptions.contactDetails;
 
   return {
     // setup configuration of the plugin
-    pluginSetup: {
+    pluginConfig: {
       formatList,
-      ppiList: ppiList.map((value) => ({ value, text: `${value} ppi` })),
+      formatDefault,
+      ppiList,
+      ppiDefault,
       orientationOptions,
+      orientationDefault,
       allowTitle,
       allowDescription,
       printLogo,
       printMapInfo,
-      contact,
+      contactDetails,
       // screenshot
       resolutionList,
+      resolutionDefault,
     },
     // initial and reactive state of the plugin.
     pluginState: reactive({
@@ -238,4 +222,32 @@ export function getSetupAndState(pluginConfig, defaultConfig) {
       selectedResolution: resolutionDefault,
     }),
   };
+}
+
+/**
+ * @param {PrintConfig} options
+ */
+export function validate(options) {
+  try {
+    options.formatList?.every((value) =>
+      check(value, Object.keys(standardPageSizes)),
+    );
+    checkMaybe(options.formatDefault, options.formatList);
+    options.ppiList?.every((value) => check(value, Number));
+    checkMaybe(options.ppiDefault, options.ppiList);
+    checkMaybe(options.orientationOptions, Object.values(OrientationOptions));
+    checkMaybe(
+      options.orientationDefault,
+      Object.values(OrientationOptions).filter((value) => value !== 'both'),
+    );
+    checkMaybe(options.allowTitle, Boolean);
+    checkMaybe(options.allowDescription, Boolean);
+    checkMaybe(options.printLogo, Boolean);
+    checkMaybe(options.printMapInfo, Boolean);
+    options.resolutionList?.every((value) => check(value, Number));
+    checkMaybe(options.resolutionDefault, options.resolutionList);
+    checkMaybe(options.contactDetails, contactKeysPattern, true);
+  } catch (err) {
+    getLogger('@vcmap/print').error('Invalid config', err);
+  }
 }

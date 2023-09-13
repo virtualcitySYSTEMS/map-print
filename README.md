@@ -12,7 +12,7 @@ In the PDF mode the user can select the page format, the pixels per inch (ppi) a
 
 ## configuration
 
-To add and configure the plugin add an entry with name @vcmap/print to the map's config plugins section.. Below the possible configuration options and their defaults are listed.
+To add and configure the plugin add an entry with name @vcmap/print to the map's config plugins section. Below the possible configuration options and their defaults are listed.
 
 ### image/JPEG
 
@@ -23,18 +23,18 @@ To add and configure the plugin add an entry with name @vcmap/print to the map's
 
 ### PDF
 
-| key                | type            | default                 | description                                                                                                                                         |
-| ------------------ | --------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| formatList         | Array\<string\> | `["A5","A4","A3","A2"]` | The possible standard page sizes. Supported are "A5","A4","A3","A2".                                                                                |
-| formatDefault      | string          | `"A4"`                  | The default page size. Needs to be a value of the formatList.                                                                                       |
-| ppiList            | Array\<number\> | `[75,150,300,450,600]`  | List of possible values for pixels per inch (ppi) of the PDF. This value has impact on the resolution of the screenshot that is printed on the pdf. |
-| ppiDefault         | number          | `300`                   | The default ppi. Needs to be a value of the ppiList.                                                                                                |
-| orientationOptions | "portrait"      | "landscape"             | "both"                                                                                                                                              | "both"                                                                                      | The possible orientation options. "both" means the user can choose either landscape or portrait. If portrait or landscape is used, this user can not choose and the key orientationDefault is ignored. |
-| orientationDefault | "portrait"      | "landscape"             | "portrait"                                                                                                                                          | The default orientation. Only necessary if orientationOptions is "both", otherwise ignored. |
-| allowTitle         | boolean         | `true`                  | Whether the user can add a title.                                                                                                                   |
-| allowDescription   | boolean         | `true`                  | Whether the user can add a description.                                                                                                             |
-| printLogo          | boolean         | `true`                  | Whether the map logo is printed on the PDF.                                                                                                         |
-| printMapInfo       | boolean         | `true`                  | Whether information about the map is printed on the PDF. Map Info is so far the coordinates of the center of the current view.                      |
+| key                | type            | default                 | description                                                                                                                                                                                            |
+| ------------------ | --------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| formatList         | Array\<string\> | `["A5","A4","A3","A2"]` | The possible standard page sizes. Supported are "A5","A4","A3","A2".                                                                                                                                   |
+| formatDefault      | string          | `"A4"`                  | The default page size. Needs to be a value of the formatList.                                                                                                                                          |
+| ppiList            | Array\<number\> | `[75,150,300,450,600]`  | List of possible values for pixels per inch (ppi) of the PDF. This value has impact on the resolution of the screenshot that is printed on the pdf.                                                    |
+| ppiDefault         | number          | `300`                   | The default ppi. Needs to be a value of the ppiList.                                                                                                                                                   |
+| orientationOptions | string          | `"both"`                | The possible orientation options. "both" means the user can choose either landscape or portrait. If portrait or landscape is used, this user can not choose and the key orientationDefault is ignored. |
+| orientationDefault | string          | `"portrait"`            | The default orientation. Only necessary if orientationOptions is "both", otherwise ignored.                                                                                                            |
+| allowTitle         | boolean         | `true`                  | Whether the user can add a title.                                                                                                                                                                      |
+| allowDescription   | boolean         | `true`                  | Whether the user can add a description.                                                                                                                                                                |
+| printLogo          | boolean         | `true`                  | Whether the map logo is printed on the PDF.                                                                                                                                                            |
+| printMapInfo       | boolean         | `true`                  | Whether information about the map is printed on the PDF. Map Info is so far the coordinates of the center of the current view.                                                                         |
 
 > **Note**: The page format specific styling of the PDF can not be modified by the map config file or by the user. If changes are necessary these have to be applied in [source code](#format-specific-styling) (./src/pdf/styles.js).
 
@@ -44,7 +44,7 @@ To add and configure the plugin add an entry with name @vcmap/print to the map's
 
 For unlocking new page formats the following steps are required:
 
-1. Extend the allowed format types in the jsdoc at the constructor of PDFCreator and the printConfig typedef in configManager.js.
+1. Extend the allowed format types in the jsdoc at the constructor of PDFCreator and the PrintConfig typedef in configManager.js.
 2. Remove comment characters in standardPageSizes.js if necessary
 3. (optional) add [format specific styling](#format-specific-styling) to ‘styling.js’.
 4. Add the new format to README documentation.

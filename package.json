@@ -44,8 +44,8 @@
     "jspdf": "^2.5.1"
   },
   "peerDependencies": {
-    "@vcmap/core": "^5.0.0-rc.35",
-    "@vcmap/ui": "^5.0.0-rc.26",
+    "@vcmap/core": "^5.0.0",
+    "@vcmap/ui": "^5.0.0-rc.31",
     "@vcsuite/check": "^1.1.2",
     "@vcsuite/logger": "^1.0.1",
     "@vcsuite/parsers": "^1.0.3",
@@ -53,7 +53,8 @@
     "vuetify": "~2.6.7"
   },
   "devDependencies": {
-    "@vcmap/plugin-cli": "^2.1.9",
+    "@vcmap/plugin-cli": "^2.1.11",
     "@vcsuite/eslint-config": "^3.0.3"
-  }
+  },
+  "mapVersion": "^5.0"
 }
