@@ -1,5 +1,5 @@
 import { ButtonLocation, createToggleAction, WindowSlot } from '@vcmap/ui';
-import { version, name } from '../package.json';
+import { name, version, mapVersion } from '../package.json';
 import PdfWindow, { pdfWindowId } from './pdf/pdfWindow.vue';
 import ScreenshotWindow, {
   screenshotWindowId,
@@ -19,6 +19,9 @@ export default (config) => {
     },
     get version() {
       return version;
+    },
+    get mapVersion() {
+      return mapVersion;
     },
     /**
      * @returns {PrintConfig}
@@ -56,7 +59,7 @@ export default (config) => {
             headerTitle: 'print.pdf.header',
             headerIcon: '$vcsPdf',
             infoUrlCallback: vcsUiApp.getHelpUrlCallback(
-              '/tools/printTool.html#id_printPDF',
+              '/components/genericFunctions.html#id_viewShare',
             ),
             styles: { width: '280px', height: 'auto' },
           },
@@ -83,7 +86,7 @@ export default (config) => {
             headerTitle: 'print.image.header',
             headerIcon: '$vcsScreenshot',
             infoUrlCallback: vcsUiApp.getHelpUrlCallback(
-              '/tools/printTool.html#id_printScreenshot',
+              '/components/genericFunctions.html#id_viewShare',
             ),
             styles: { width: '280px', height: 'auto' },
           },

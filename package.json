@@ -15,7 +15,7 @@
     "lint": "npm run lint:js && npm run lint:prettier",
     "format": "prettier --write --list-different . && npm run lint:js -- --fix"
   },
-  "author": "Virtual City Systems",
+  "author": "Tobias Krauth <tkrauth@vc.systems>",
   "license": "MIT",
   "keywords": [
     "vcmap",
@@ -26,14 +26,16 @@
     "dist/",
     "plugin-assets/",
     "LICENSE.md",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "exports": {
     ".": "./src/index.js",
     "./dist": "./dist/index.js"
   },
   "eslintIgnore": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ],
   "eslintConfig": {
     "root": true,
@@ -45,7 +47,7 @@
   },
   "peerDependencies": {
     "@vcmap/core": "^5.0.0",
-    "@vcmap/ui": "^5.0.0-rc.31",
+    "@vcmap/ui": "^5.0.0",
     "@vcsuite/check": "^1.1.2",
     "@vcsuite/logger": "^1.0.1",
     "@vcsuite/parsers": "^1.0.3",
@@ -53,7 +55,7 @@
     "vuetify": "~2.6.7"
   },
   "devDependencies": {
-    "@vcmap/plugin-cli": "^2.1.11",
+    "@vcmap/plugin-cli": "^2.1.12",
     "@vcsuite/eslint-config": "^3.0.3"
   },
   "mapVersion": "^5.0"
