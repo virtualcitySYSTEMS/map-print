@@ -91,9 +91,9 @@ async function getImageFromOpenlayers(map, canvasSize) {
         );
       olLayerCanvasList.forEach((layerCanvas) => {
         if (layerCanvas.width > 0) {
-          const { opacity } = /** @type {HTMLElement} */ (
-            layerCanvas.parentNode
-          ).style;
+          const opacity =
+            layerCanvas.parentNode?.style?.opacity ||
+            layerCanvas.style?.opacity;
           canvasContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
           const { transform } = layerCanvas.style;
           /** @type {DOMMatrix2DInit} */
@@ -104,8 +104,10 @@ async function getImageFromOpenlayers(map, canvasSize) {
               .map(Number)
           );
           canvasContext.setTransform(...matrix);
-          // fill canvas with white so transparent pixels are not printed as black when exporting as jpeg.
-          canvasContext.fillStyle = 'white';
+          // fill canvas with transparent white so transparent pixels are not printed as black when exporting as jpeg.
+          canvasContext.fillStyle =
+            layerCanvas.parentNode?.style?.backgroundColor ||
+            'rgba(255,255,255,0)';
           canvasContext.fillRect(0, 0, canvas.width, canvas.height);
           canvasContext.drawImage(layerCanvas, 0, 0);
         }

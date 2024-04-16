@@ -1,4 +1,8 @@
-# v1.0.7
+# v1.0.9
+
+- Fixes a bug where screenshots with active geojson layer had transparency issues
+
+# v1.0.8
 
 - Fix i18n en
 - audit fix
