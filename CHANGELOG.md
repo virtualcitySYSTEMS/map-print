@@ -1,6 +1,7 @@
 # v1.0.9
 
 - Fixes a bug where screenshots with active geojson layer had transparency issues
+- Fixes a bug where some flags in could not be changed in the Plugin Editor
 
 # v1.0.8
 

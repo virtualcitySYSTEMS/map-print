@@ -114,7 +114,12 @@
             </VcsLabel>
           </v-col>
           <v-col>
-            <VcsCheckbox :id="key" v-model="localConfig[key]" />
+            <VcsCheckbox
+              :id="key"
+              :true-value="true"
+              :false-value="false"
+              v-model="localConfig[key]"
+            />
           </v-col>
         </v-row>
         <v-row no-gutters>
@@ -126,6 +131,8 @@
           <v-col>
             <VcsCheckbox
               id="printContactDetails"
+              :true-value="true"
+              :false-value="false"
               v-model="printContactDetails"
             />
           </v-col>
