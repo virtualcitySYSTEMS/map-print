@@ -13,6 +13,8 @@ import PrintConfigEditor from './PrintConfigEditor.vue';
  * @returns {Object}
  */
 export default (config) => {
+  /** {@type import("@vcmap/ui").VcsUiApp | undefined} */
+  let app;
   return {
     get name() {
       return name;
@@ -35,7 +37,8 @@ export default (config) => {
     get state() {
       return this._pluginState;
     },
-    initialize() {
+    initialize(vcsUiApp) {
+      app = vcsUiApp;
       validate(config);
       const { pluginConfig, pluginState } = getConfigAndState(
         config,
@@ -156,7 +159,14 @@ export default (config) => {
      */
     getDefaultOptions,
     getConfigEditors() {
-      return [{ component: PrintConfigEditor }];
+      return [
+        {
+          component: PrintConfigEditor,
+          infoUrlCallback: app?.getHelpUrlCallback(
+            '/components/plugins/printToolConfig.html',
+          ),
+        },
+      ];
     },
     i18n: {
       de: {

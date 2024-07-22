@@ -19,7 +19,7 @@
               multiple
               :items="['A5', 'A4', 'A3', 'A2']"
               v-model="localConfig.formatList"
-              @input="(v) => updateDefault('formatDefault', v)"
+              @update:modelValue="(v) => updateDefault('formatDefault', v)"
             />
           </v-col>
         </v-row>
@@ -51,7 +51,7 @@
               type="number"
               placeholder="300"
               v-model="localConfig.ppiList"
-              @input="(v) => updateDefault('ppiDefault', v)"
+              @update:modelValue="(v) => updateDefault('ppiDefault', v)"
             />
           </v-col>
         </v-row>
@@ -110,7 +110,7 @@
         >
           <v-col>
             <VcsLabel :html-for="key">
-              {{ $t(`print.editor.${key}`) }}
+              {{ $st(`print.editor.${key}`) }}
             </VcsLabel>
           </v-col>
           <v-col>
@@ -154,7 +154,7 @@
           >
             <v-col>
               <VcsLabel :html-for="key">
-                {{ $t(`print.editor.contactDetails.${key}`) }}
+                {{ $st(`print.editor.contactDetails.${key}`) }}
               </VcsLabel>
             </v-col>
             <v-col>
@@ -188,7 +188,7 @@
               placeholder="1920"
               type="number"
               v-model="localConfig.resolutionList"
-              @input="(v) => updateDefault('resolutionDefault', v)"
+              @update:modelValue="(v) => updateDefault('resolutionDefault', v)"
             />
           </v-col>
         </v-row>
@@ -213,7 +213,7 @@
 </template>
 
 <script>
-  import { VContainer, VRow, VCol } from 'vuetify/lib';
+  import { VContainer, VRow, VCol } from 'vuetify/components';
   import {
     AbstractConfigEditor,
     VcsFormSection,
@@ -268,15 +268,15 @@
       const orientationOptionsItems = [
         {
           value: 'landscape',
-          text: 'print.editor.orientation.landscape',
+          title: 'print.editor.orientation.landscape',
         },
         {
           value: 'portrait',
-          text: 'print.editor.orientation.portrait',
+          title: 'print.editor.orientation.portrait',
         },
         {
           value: 'both',
-          text: 'print.editor.orientation.both',
+          title: 'print.editor.orientation.both',
         },
       ];
 

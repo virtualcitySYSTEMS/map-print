@@ -1,8 +1,9 @@
 import { parseBoolean, parseEnumValue } from '@vcsuite/parsers';
-import { check, checkMaybe } from '@vcsuite/check';
+import { check, maybe, ofEnum, oneOf, strict } from '@vcsuite/check';
 import { reactive } from 'vue';
 import { getLogger } from '@vcsuite/logger';
 import standardPageSizes from '../pdf/standardPageSizes.js';
+import getDefaultOptions from '../defaultOptions.js';
 
 /**
  * Enumeration of allowed orientations.
@@ -32,17 +33,17 @@ export const OrientationOptions = {
 
 /**
  * Possible contact keys with corresponding type
- * @type {Object<string,Array<StringConstructor|undefined>>}
+ * @type {Record<string, import("@vcsuite/check").Pattern>}
  */
 export const contactKeysPattern = {
-  department: [String, undefined],
-  name: [String, undefined],
-  streetAddress: [String, undefined],
-  zipAndCity: [String, undefined],
-  country: [String, undefined],
-  mail: [String, undefined],
-  phone: [String, undefined],
-  fax: [String, undefined],
+  department: maybe(String),
+  name: maybe(String),
+  streetAddress: maybe(String),
+  zipAndCity: maybe(String),
+  country: maybe(String),
+  mail: maybe(String),
+  phone: maybe(String),
+  fax: maybe(String),
 };
 
 /**
@@ -228,25 +229,31 @@ export function getConfigAndState(pluginConfig, defaultOptions) {
  * @param {PrintConfig} options
  */
 export function validate(options) {
+  const defaultOptions = getDefaultOptions();
   try {
-    options.formatList?.every((value) =>
-      check(value, Object.keys(standardPageSizes)),
+    check(
+      options.formatList,
+      maybe([oneOf(...Object.keys(standardPageSizes))]),
     );
-    checkMaybe(options.formatDefault, options.formatList);
-    options.ppiList?.every((value) => check(value, Number));
-    checkMaybe(options.ppiDefault, options.ppiList);
-    checkMaybe(options.orientationOptions, Object.values(OrientationOptions));
-    checkMaybe(
+    const formatList = options.formatList || defaultOptions.formatList;
+    check(options.formatDefault, maybe(oneOf(...formatList)));
+    check(options.ppiList, maybe([Number]));
+    const ppiList = options.ppiList || defaultOptions.ppiList;
+    check(options.ppiDefault, maybe(oneOf(...ppiList)));
+    check(options.orientationOptions, maybe(ofEnum(OrientationOptions)));
+    check(
       options.orientationDefault,
-      Object.values(OrientationOptions).filter((value) => value !== 'both'),
+      maybe(oneOf(OrientationOptions.LANDSCAPE, OrientationOptions.PORTRAIT)),
     );
-    checkMaybe(options.allowTitle, Boolean);
-    checkMaybe(options.allowDescription, Boolean);
-    checkMaybe(options.printLogo, Boolean);
-    checkMaybe(options.printMapInfo, Boolean);
-    options.resolutionList?.every((value) => check(value, Number));
-    checkMaybe(options.resolutionDefault, options.resolutionList);
-    checkMaybe(options.contactDetails, contactKeysPattern, true);
+    check(options.allowTitle, maybe(Boolean));
+    check(options.allowDescription, maybe(Boolean));
+    check(options.printLogo, maybe(Boolean));
+    check(options.printMapInfo, maybe(Boolean));
+    check(options.resolutionList, maybe([Number]));
+    const resolutionList =
+      options.resolutionList || defaultOptions.resolutionList;
+    check(options.resolutionDefault, maybe(oneOf(...resolutionList)));
+    check(options.contactDetails, maybe(strict(contactKeysPattern)));
   } catch (err) {
     getLogger('@vcmap/print').error('Invalid config', err);
   }

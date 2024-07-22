@@ -1,41 +1,44 @@
 <template>
   <div>
-    <v-overlay :value="running" absolute :opacity="1" color="basic">
-      <v-icon x-large color="primary"> $vcsProgress </v-icon>
+    <v-overlay
+      :model-value="running"
+      contained
+      persistent
+      class="d-flex justify-center align-center"
+    >
+      <v-icon size="x-large" color="primary"> $vcsProgress </v-icon>
     </v-overlay>
     <v-container class="py-0 px-1">
       <v-row no-gutters>
-        <v-col cols="7">
-          <VcsLabel html-for="sizeSelect" :dense="true">
+        <v-col cols="6">
+          <VcsLabel html-for="sizeSelect">
             {{ $t('print.pdf.format') }}
           </VcsLabel>
         </v-col>
-        <v-col>
+        <v-col cols="6">
           <VcsSelect
             id="sizeSelect"
             :items="pluginSetup.formatList"
             v-model="pluginState.selectedFormat"
-            :dense="true"
           />
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col cols="7">
-          <VcsLabel html-for="ppiSelect" :dense="true">
+        <v-col cols="6">
+          <VcsLabel html-for="ppiSelect">
             {{ $t('print.pdf.resolution') }}
           </VcsLabel>
         </v-col>
-        <v-col>
+        <v-col cols="6">
           <VcsSelect
             id="ppiSelect"
             :items="
               pluginSetup.ppiList.map((value) => ({
                 value,
-                text: `${value} ppi`,
+                title: `${value} ppi`,
               }))
             "
             v-model="pluginState.selectedPpi"
-            :dense="true"
           />
         </v-col>
       </v-row>
@@ -43,7 +46,7 @@
         <VcsRadio
           v-model="pluginState.selectedOrientation"
           mandatory
-          row
+          inline
           :items="[
             { label: $t('print.pdf.portrait'), value: 'portrait' },
             { label: $t('print.pdf.landscape'), value: 'landscape' },
@@ -56,7 +59,6 @@
       <v-row no-gutters>
         <v-col>
           <VcsTextField
-            :dense="true"
             :label="undefined"
             :placeholder="$t('print.pdf.titlePlaceholder')"
             v-model="pluginState.title"
@@ -68,7 +70,7 @@
         <v-col>
           <VcsTextArea
             :placeholder="$t('print.pdf.descriptionPlaceholder')"
-            class="pb-4"
+            class="pt-1 pb-4"
             rows="2"
             v-model="pluginState.description"
             v-if="pluginSetup.allowDescription"
@@ -109,7 +111,8 @@
     VRow,
     VCol,
     VDivider,
-  } from 'vuetify/lib';
+  } from 'vuetify/components';
+  import { getLogger } from '@vcsuite/logger';
   import PDFCreator from './pdfCreator.js';
   import createAndHandleBlob from '../screenshot/shootScreenAndHandle.js';
   import { name } from '../../package.json';
@@ -150,9 +153,16 @@
 
       /** Creates pdf by utilizing the PDFCreator. Handling is done by default function in shootScreenAndHandle.js */
       async function createPdf() {
+        running.value = true;
         let logo;
         if (pluginSetup.printLogo) {
-          logo = await getLogo(app);
+          try {
+            logo = await getLogo(app);
+          } catch (error) {
+            getLogger(plugin?.name).error(
+              `Fetching logo failed with following error: ${error}`,
+            );
+          }
         }
 
         /** contact information that can be defined in the plugin config and is printed in the lower left corner */
@@ -201,11 +211,11 @@
           pdfCreator.imgPlacement.size.width * pluginState.selectedPpi;
         await createAndHandleBlob(
           app,
-          running,
           width,
           pdfCreator.create.bind(pdfCreator),
           'map.pdf',
         );
+        running.value = false;
       }
 
       return {

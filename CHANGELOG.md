@@ -1,3 +1,9 @@
+# v2.0.0
+
+- Updates @vcmap/core and @vcmap/ui to version 6.x
+- Fixes plugin crash when logo can not be loaded due to CORS error.
+- Adds `crossOrigin="anonymous"` to image loading logo
+
 # v1.0.9
 
 - Fixes a bug where screenshots with active geojson layer had transparency issues

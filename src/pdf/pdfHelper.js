@@ -38,11 +38,13 @@ export function formatContactInfo(app, contactInfo) {
  * Gets the logo to be printed on the PDF.
  * @param {import("@vcmap/ui").VcsUiApp} app VcsUiApp instance.
  * @returns {Promise<HTMLImageElement>} Either the logo defined in the config or the default VCS logo.
+ * @throws Will throw error if decoding failes.
  */
 export async function getLogo(app) {
   const logo = new Image();
+  logo.crossOrigin = 'anonymous';
   const mapLogo = app.uiConfig?.config?.value?.logo;
-  const logoSrc = mapLogo || VcsDefaultLogo;
+  const logoSrc = mapLogo ?? VcsDefaultLogo;
   // .svg file extension, <svg tag OR image/svg as in base64 encoded svg files.
   if (/([.<]|%3C)svg/gi.test(logoSrc) || /image\/svg/i.test(logoSrc)) {
     // 120 px is the height of the logo in 300 dpi in portrait mode.

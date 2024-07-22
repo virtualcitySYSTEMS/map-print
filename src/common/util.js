@@ -1,16 +1,6 @@
 import { CesiumMap, ObliqueMap, OpenlayersMap } from '@vcmap/core';
 
 /**
- * Helps when ui freezes
- * @returns {Promise} Promise that is immediately resolved
- */
-export async function sleep() {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 0);
-  });
-}
-
-/**
  * Convert svg image to png.
  * @param {string} svgPath The path to the svg image.
  * @param {number} height Height in pixels of the resulting png.

@@ -1,12 +1,17 @@
 <template>
   <div>
-    <v-overlay :value="running" absolute :opacity="1" color="basic">
-      <v-icon x-large color="primary"> $vcsProgress </v-icon>
+    <v-overlay
+      :model-value="running"
+      contained
+      persistent
+      class="d-flex justify-center align-center"
+    >
+      <v-icon size="x-large" color="primary"> $vcsProgress </v-icon>
     </v-overlay>
     <v-container class="py-0 px-1">
       <v-row no-gutters>
         <v-col cols="5">
-          <VcsLabel html-for="sizeSelect" :dense="true">
+          <VcsLabel html-for="sizeSelect">
             {{ $t('print.image.resolution') }}
           </VcsLabel>
         </v-col>
@@ -15,7 +20,6 @@
             id="sizeSelect"
             v-model="pluginState.selectedResolution"
             :items="calculatedResList"
-            :dense="true"
           />
         </v-col>
       </v-row>
@@ -43,7 +47,7 @@
     VRow,
     VCol,
     VDivider,
-  } from 'vuetify/lib';
+  } from 'vuetify/components';
   import createAndHandleBlob from './shootScreenAndHandle.js';
   import { getMapAspectRatio } from '../common/util.js';
 
@@ -121,7 +125,7 @@
 
           return {
             value,
-            text: `${width} x ${height} px`,
+            title: `${width} x ${height} px`,
           };
         });
       });
@@ -130,6 +134,7 @@
        * Utilize the shootScreenAndHandle function for creating the JPG.
        */
       async function createJPG() {
+        running.value = true;
         const jpgCreateFunction = (canvas) => {
           return new Promise((resolve) => {
             canvas.toBlob(resolve, 'image/jpeg');
@@ -139,13 +144,8 @@
           mapAspectRatio.value >= 1
             ? pluginState.selectedResolution
             : pluginState.selectedResolution * mapAspectRatio.value;
-        await createAndHandleBlob(
-          app,
-          running,
-          width,
-          jpgCreateFunction,
-          'map.jpg',
-        );
+        await createAndHandleBlob(app, width, jpgCreateFunction, 'map.jpg');
+        running.value = false;
       }
 
       return {
