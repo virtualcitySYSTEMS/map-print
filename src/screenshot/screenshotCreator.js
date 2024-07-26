@@ -95,20 +95,22 @@ async function getImageFromOpenlayers(map, canvasSize) {
             layerCanvas.parentNode?.style?.opacity ||
             layerCanvas.style?.opacity;
           canvasContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-          const { transform } = layerCanvas.style;
-          /** @type {DOMMatrix2DInit} */
-          const matrix = /** @type {DOMMatrix2DInit} */ (
-            transform
-              .match(/^matrix\(([^(]*)\)$/)[1]
-              .split(',')
-              .map(Number)
-          );
-          canvasContext.setTransform(...matrix);
-          // fill canvas with transparent white so transparent pixels are not printed as black when exporting as jpeg.
+          // fill canvas with white so transparent pixels are not printed as black when exporting as jpeg.
           canvasContext.fillStyle =
             layerCanvas.parentNode?.style?.backgroundColor ||
-            'rgba(255,255,255,0)';
+            'rgba(255,255,255,1)';
           canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+          const { transform } = layerCanvas.style;
+          const matrix =
+            /** @type {[number, number, number, number, number, number] | undefined} */ (
+              transform
+                .match(/^matrix\(([^(]*)\)$/)?.[1]
+                .split(',')
+                .map(Number)
+            );
+          if (matrix) {
+            canvasContext.setTransform(...matrix);
+          }
           canvasContext.drawImage(layerCanvas, 0, 0);
         }
       });
