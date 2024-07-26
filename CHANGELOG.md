@@ -1,3 +1,7 @@
+# v1.0.10
+
+- Changes transparent background to be white instead of black
+
 # v1.0.9
 
 - Fixes a bug where screenshots with active geojson layer had transparency issues
