@@ -4,6 +4,10 @@
 - Fixes plugin crash when logo can not be loaded due to CORS error.
 - Adds `crossOrigin="anonymous"` to image loading logo
 
+# v1.0.11
+
+- Fixes a bug where every layer had white background, which covered layers below
+
 # v1.0.10
 
 - Changes transparent background to be white instead of black
