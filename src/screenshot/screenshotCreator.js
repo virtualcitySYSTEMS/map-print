@@ -82,6 +82,9 @@ async function getImageFromOpenlayers(map, canvasSize) {
   canvas.height = canvasSize[1];
   const { olMap } = map;
   const canvasContext = canvas.getContext('2d');
+  // fill canvas with white so transparent pixels are not printed as black when exporting as jpeg.
+  canvasContext.fillStyle = 'white';
+  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
   await new Promise((resolve) => {
     olMap.once('rendercomplete', () => {
       /** @type {Array<HTMLCanvasElement>} */
@@ -95,11 +98,6 @@ async function getImageFromOpenlayers(map, canvasSize) {
             layerCanvas.parentNode?.style?.opacity ||
             layerCanvas.style?.opacity;
           canvasContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-          // fill canvas with white so transparent pixels are not printed as black when exporting as jpeg.
-          canvasContext.fillStyle =
-            layerCanvas.parentNode?.style?.backgroundColor ||
-            'rgba(255,255,255,1)';
-          canvasContext.fillRect(0, 0, canvas.width, canvas.height);
           const { transform } = layerCanvas.style;
           const matrix =
             /** @type {[number, number, number, number, number, number] | undefined} */ (
