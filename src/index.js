@@ -178,9 +178,8 @@ export default (config) => {
             resolution: 'Auflösung',
             portrait: 'Hochformat',
             landscape: 'Querformat',
-            titlePlaceholder: 'Hier Titel einfügen',
-            descriptionPlaceholder:
-              'Hier Beschreibung einfügen, kann mehrzeilig sein',
+            titlePlaceholder: 'Titel',
+            descriptionPlaceholder: 'Beschreibung (mehrzeilig möglich)',
             createButton: 'Erstellen',
             content: {
               contact: {
@@ -240,8 +239,8 @@ export default (config) => {
             resolution: 'Resolution',
             portrait: 'Portrait',
             landscape: 'Landscape',
-            titlePlaceholder: 'Insert title here',
-            descriptionPlaceholder: 'Insert description here, can be multiline',
+            titlePlaceholder: 'Title',
+            descriptionPlaceholder: 'Description (multiline possible)',
             createButton: 'Create',
             content: {
               contact: {
