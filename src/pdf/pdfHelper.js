@@ -1,4 +1,4 @@
-import { VcsDefaultLogo } from '@vcmap/ui';
+import { getAttributions, VcsDefaultLogo } from '@vcmap/ui';
 import { svgToPng } from '../common/util.js';
 
 /**
@@ -75,4 +75,31 @@ export async function getMapInfo(app) {
       // can be extended by other informations like layers
     ],
   };
+}
+
+/**
+ * Get all unique tuples of provider and year for all sources.
+ * @param {import("@vcmap/core").VcsApp} app The vcs ui app.
+ * @returns {string | undefined} A string containing unique tuples of provider and year for all sources.
+ */
+export function getCopyright(app) {
+  const copyrightEntries = getAttributions(app).entries;
+  if (copyrightEntries) {
+    let copyright = copyrightEntries
+      .map((entry) => {
+        const { provider, year } = entry.attributions[0] || {};
+        if (provider) {
+          return year ? `@ ${provider} ${year}` : `@ ${provider}`;
+        }
+        return '';
+      })
+      .filter(Boolean)
+      .join(' | ');
+
+    if (copyright[copyright.length - 1] === '| ') {
+      copyright = copyright.slice(0, copyright.length - 2);
+    }
+    return copyright;
+  }
+  return undefined;
 }

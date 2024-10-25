@@ -6,7 +6,7 @@
   "scripts": {
     "prepublishOnly": "vcmplugin build",
     "build": "vcmplugin build",
-    "pack": "vcmplugin pack",
+    "bundle": "vcmplugin bundle",
     "start": "vcmplugin serve",
     "preview": "vcmplugin preview",
     "buildStagingApp": "vcmplugin buildStagingApp",
@@ -49,13 +49,13 @@
     "jspdf": "^2.5.1"
   },
   "peerDependencies": {
-    "@vcmap/core": "^6.0.0-rc.12",
-    "@vcmap/ui": "^6.0.0-rc.10",
+    "@vcmap/core": "^6.0.0",
+    "@vcmap/ui": "^6.0.1",
     "vue": "~3.4.38",
-    "vuetify": "^3.7.2"
+    "vuetify": "^3.7.3"
   },
   "devDependencies": {
-    "@vcmap/plugin-cli": "^4.0.0-rc.5",
+    "@vcmap/plugin-cli": "^4.0.1",
     "@vcsuite/eslint-config": "^3.0.8"
   },
   "mapVersion": "^6.0"

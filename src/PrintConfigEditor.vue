@@ -105,6 +105,7 @@
             'allowDescription',
             'printLogo',
             'printMapInfo',
+            'printCopyright',
           ]"
           :key="key"
         >
@@ -228,7 +229,6 @@
 
   export default {
     name: 'PrintConfigEditor',
-    title: 'Print Editor',
     components: {
       VContainer,
       VRow,
@@ -255,16 +255,17 @@
       const localConfig = ref();
       const printContactDetails = ref(false);
       const defaultOptions = getDefaultOptions();
-      props.getConfig().then((config) => {
-        localConfig.value = Object.assign(
-          structuredClone(defaultOptions),
-          config,
-        );
-        printContactDetails.value =
-          config.contactDetails &&
-          Object.keys(config.contactDetails).length > 0;
-        localConfig.value.contactDetails = config.contactDetails || {};
-      });
+      const config = props.getConfig();
+
+      localConfig.value = Object.assign(
+        structuredClone(defaultOptions),
+        config,
+      );
+
+      printContactDetails.value =
+        config.contactDetails && Object.keys(config.contactDetails).length > 0;
+
+      localConfig.value.contactDetails = config.contactDetails || {};
       const orientationOptionsItems = [
         {
           value: 'landscape',
@@ -293,7 +294,7 @@
         ) {
           delete localConfig.value.contactDetails;
         }
-        await props.setConfig(localConfig.value);
+        props.setConfig(localConfig.value);
       };
 
       return {

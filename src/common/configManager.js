@@ -61,6 +61,7 @@ export const contactKeysPattern = {
  * @property {Array<number>} resolutionList List of resolution the user can choose from for image/jpg creation.
  * @property {number} resolutionDefault The default resolution. Needs to be in resolutionList.
  * @property {ContactInfo} [contactDetails] The contact information to be printed on pdf.
+ * @property {boolean} printCopyright Whether copyright should be printed on pdf or not.
  */
 
 /**
@@ -162,6 +163,15 @@ export function getConfigAndState(pluginConfig, defaultOptions) {
   );
 
   /**
+   * Whether copyright should be printed on pdf or not.
+   * @type {boolean}
+   */
+  const printCopyright = parseBoolean(
+    pluginConfig.printCopyright,
+    defaultOptions.printCopyright,
+  );
+
+  /**
    * Whether map information should be printed on pdf or not.
    * @type {boolean}
    */
@@ -206,6 +216,7 @@ export function getConfigAndState(pluginConfig, defaultOptions) {
       allowTitle,
       allowDescription,
       printLogo,
+      printCopyright,
       printMapInfo,
       contactDetails,
       // screenshot
@@ -248,6 +259,7 @@ export function validate(options) {
     check(options.allowTitle, maybe(Boolean));
     check(options.allowDescription, maybe(Boolean));
     check(options.printLogo, maybe(Boolean));
+    check(options.printCopyright, maybe(Boolean));
     check(options.printMapInfo, maybe(Boolean));
     check(options.resolutionList, maybe([Number]));
     const resolutionList =

@@ -2,7 +2,8 @@
 
 - Updates @vcmap/core and @vcmap/ui to version 6.x
 - Fixes plugin crash when logo can not be loaded due to CORS error.
-- Adds `crossOrigin="anonymous"` to image loading logo
+- Adds `crossOrigin="anonymous"` to image loading logo.
+- Adds copyright to screenshot.
 
 # v1.0.11
 

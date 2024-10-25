@@ -40,6 +40,7 @@ import {
  * @property {string | undefined} description The description below the image.
  * @property {TextWithHeader | undefined} contact The contact information in the lower left corner.
  * @property {TextWithHeader | undefined} mapInfo Information about the map content.
+ * @property {string | undefined} copyright Information about the copyright.
  * @property {{name: string, bold: string, regular: string} | undefined} fonts Paths to bold and regular weight for named font.
  */
 
@@ -217,6 +218,23 @@ export default class PDFCreator {
      * @type {ElementPlacement}
      */
     this.imgPlacement = this._calcImagePlacement(pdfCreatorOptions.imgRatio);
+
+    if (pdfCreatorOptions.copyright) {
+      this._setTextStyle('info');
+      /**
+       * Unique copyright from all active layers.
+       * @type {string}
+       */
+      this.copyright = pdfCreatorOptions.copyright;
+      /**
+       * Position and dimensions of the copyright.
+       * @type {ElementPlacement}
+       */
+      this.copyrightPlacement = this._calcCopyrightPlacement(
+        pdfCreatorOptions.copyright,
+      );
+    }
+
     this.initialized = true;
   }
 
@@ -484,6 +502,38 @@ export default class PDFCreator {
     };
   }
 
+  _calcCopyrightPlacement(copyright) {
+    this._setTextStyle('info');
+    this.pdfDoc.setFontSize(6);
+    const lines = this.pdfDoc.splitTextToSize(
+      copyright,
+      this.imgPlacement.size.width,
+    );
+    const height = this._calcTotalLineHeight(lines.length);
+    let width = 0;
+
+    lines.forEach((line) => {
+      const lineWidth = this.pdfDoc.getTextWidth(line);
+      if (lineWidth > width) {
+        width = lineWidth;
+      }
+    });
+
+    const x = this.imgPlacement.coords.x + this.imgPlacement.size.width - width;
+    const y =
+      this.imgPlacement.coords.y + this.imgPlacement.size.height - height;
+    return {
+      coords: {
+        x,
+        y,
+      },
+      size: {
+        width,
+        height,
+      },
+    };
+  }
+
   /**
    * Creates a PDF file using the data from the init function as well as the input canvas. init() needs to be executed first.
    * @param {HTMLCanvasElement} canvas Canvas with screenshot of map.
@@ -514,6 +564,28 @@ export default class PDFCreator {
       this.imgPlacement.size.width,
       this.imgPlacement.size.height,
     );
+
+    if (this.copyright) {
+      this._setTextStyle('info');
+      this.pdfDoc.setFillColor(0, 0, 0, 0.1);
+      this.pdfDoc.rect(
+        this.copyrightPlacement.coords.x,
+        this.copyrightPlacement.coords.y,
+        this.copyrightPlacement.size.width,
+        this.copyrightPlacement.size.height,
+        'F',
+      );
+      this.pdfDoc.setFontSize(6);
+      this.pdfDoc.text(
+        this.pdfDoc.splitTextToSize(
+          this.copyright,
+          this.copyrightPlacement.size.width,
+        ),
+        this.copyrightPlacement.coords.x,
+        this.copyrightPlacement.coords.y,
+        { baseline: 'top' },
+      );
+    }
 
     if (this.logo) {
       this.pdfDoc.addImage(

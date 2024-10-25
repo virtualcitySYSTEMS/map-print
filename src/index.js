@@ -152,6 +152,9 @@ export default (config) => {
       if (this.config.contactDetails) {
         options.contactDetails = this.config.contactDetails;
       }
+      if (this.config.printCopyright !== defaultOptions.printCopyright) {
+        options.printCopyright = this.config.printCopyright;
+      }
       return options;
     },
     /**
@@ -162,8 +165,10 @@ export default (config) => {
       return [
         {
           component: PrintConfigEditor,
+          title: 'print.editorTitle',
           infoUrlCallback: app?.getHelpUrlCallback(
             '/components/plugins/printToolConfig.html',
+            'app-configurator',
           ),
         },
       ];
@@ -171,6 +176,7 @@ export default (config) => {
     i18n: {
       de: {
         print: {
+          editorTitle: 'Print Editor',
           pdf: {
             tooltip: 'PDF der aktuellen Ansicht erstellen',
             header: 'PDF erstellen',
@@ -215,6 +221,7 @@ export default (config) => {
             printLogo: 'Logo anzeigen',
             printMapInfo: 'Karteninformation anzeigen',
             printContactDetails: 'Kontaktinformationen anzeigen',
+            printCopyright: 'Copyright anzeigen',
             contactDetails: {
               department: 'Abteilung',
               name: 'Name',
@@ -232,6 +239,7 @@ export default (config) => {
       },
       en: {
         print: {
+          editorTitle: 'Print Editor',
           pdf: {
             tooltip: 'Create PDF of current view',
             header: 'Create PDF',
@@ -276,6 +284,7 @@ export default (config) => {
             printLogo: 'Show logo',
             printMapInfo: 'Show map information',
             printContactDetails: 'Show contact details',
+            printCopyright: 'Show copyright',
             contactDetails: {
               department: 'Department',
               name: 'Name',
