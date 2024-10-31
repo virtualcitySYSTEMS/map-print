@@ -52,6 +52,7 @@
               placeholder="300"
               v-model="localConfig.ppiList"
               @update:modelValue="(v) => updateDefault('ppiDefault', v)"
+              :rules="[(v) => v > 0 || 'components.validation.notValid']"
             />
           </v-col>
         </v-row>
@@ -65,7 +66,7 @@
             <VcsSelect
               id="ppiDefault"
               :items="localConfig.ppiList"
-              v-model="localConfig.ppiDefault"
+              v-model.number="localConfig.ppiDefault"
               :rules="[(v) => !!v || 'components.validation.required']"
             />
           </v-col>
@@ -110,30 +111,22 @@
           :key="key"
         >
           <v-col>
-            <VcsLabel :html-for="key">
-              {{ $st(`print.editor.${key}`) }}
-            </VcsLabel>
-          </v-col>
-          <v-col>
             <VcsCheckbox
               :id="key"
               :true-value="true"
               :false-value="false"
+              :label="`print.editor.${key}`"
               v-model="localConfig[key]"
             />
           </v-col>
         </v-row>
         <v-row no-gutters>
           <v-col>
-            <VcsLabel html-for="printContactDetails">
-              {{ $t('print.editor.printContactDetails') }}
-            </VcsLabel>
-          </v-col>
-          <v-col>
             <VcsCheckbox
               id="printContactDetails"
               :true-value="true"
               :false-value="false"
+              label="print.editor.printContactDetails"
               v-model="printContactDetails"
             />
           </v-col>
@@ -153,12 +146,12 @@
             ]"
             :key="key"
           >
-            <v-col>
+            <v-col class="pl-4">
               <VcsLabel :html-for="key">
                 {{ $st(`print.editor.contactDetails.${key}`) }}
               </VcsLabel>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <VcsTextField
                 :id="key"
                 clearable
@@ -190,6 +183,7 @@
               type="number"
               v-model="localConfig.resolutionList"
               @update:modelValue="(v) => updateDefault('resolutionDefault', v)"
+              :rules="[(v) => v > 0 || 'components.validation.notValid']"
             />
           </v-col>
         </v-row>
@@ -203,7 +197,7 @@
             <VcsSelect
               id="resolutionDefault"
               :items="localConfig.resolutionList"
-              v-model="localConfig.resolutionDefault"
+              v-model.number="localConfig.resolutionDefault"
               :rules="[(v) => !!v || 'components.validation.required']"
             />
           </v-col>
