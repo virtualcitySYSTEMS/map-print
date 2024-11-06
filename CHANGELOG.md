@@ -1,6 +1,7 @@
 # v2.0.1
 
 - Adds input validation to config editor and ensures correct types for default values.
+- Fixes buggy toJSON function of plugin
 
 # v2.0.0
 

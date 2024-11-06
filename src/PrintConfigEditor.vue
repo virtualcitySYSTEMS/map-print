@@ -110,7 +110,7 @@
           ]"
           :key="key"
         >
-          <v-col>
+          <v-col class="pl-1">
             <VcsCheckbox
               :id="key"
               :true-value="true"
@@ -121,7 +121,7 @@
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col>
+          <v-col class="pl-1">
             <VcsCheckbox
               id="printContactDetails"
               :true-value="true"
@@ -146,7 +146,7 @@
             ]"
             :key="key"
           >
-            <v-col class="pl-4">
+            <v-col class="pl-5">
               <VcsLabel :html-for="key">
                 {{ $st(`print.editor.contactDetails.${key}`) }}
               </VcsLabel>
@@ -218,7 +218,7 @@
     VcsCheckbox,
     VcsChipArrayInput,
   } from '@vcmap/ui';
-  import { ref } from 'vue';
+  import { ref, toRaw } from 'vue';
   import getDefaultOptions from './defaultOptions.js';
 
   export default {
@@ -288,7 +288,7 @@
         ) {
           delete localConfig.value.contactDetails;
         }
-        props.setConfig(localConfig.value);
+        props.setConfig(structuredClone(toRaw(localConfig.value)));
       };
 
       return {

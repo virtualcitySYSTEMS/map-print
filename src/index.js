@@ -1,4 +1,5 @@
 import { ButtonLocation, createToggleAction, WindowSlot } from '@vcmap/ui';
+import deepEqual from 'fast-deep-equal';
 import { name, version, mapVersion } from '../package.json';
 import PdfWindow, { pdfWindowId } from './pdf/pdfWindow.vue';
 import ScreenshotWindow, {
@@ -109,52 +110,12 @@ export default (config) => {
     toJSON() {
       const defaultOptions = getDefaultOptions();
       const options = {};
-      if (this.config.formatList !== defaultOptions.formatList) {
-        options.formatList = this.config.formatList;
-      }
-      if (this.config.formatDefault !== defaultOptions.formatDefault) {
-        options.formatDefault = this.config.formatDefault;
-      }
-      if (this.config.ppiList !== defaultOptions.ppiList) {
-        options.ppiList = this.config.ppiList;
-      }
-      if (this.config.ppiDefault !== defaultOptions.ppiDefault) {
-        options.ppiDefault = this.config.ppiDefault;
-      }
-      if (
-        this.config.orientationOptions !== defaultOptions.orientationOptions
-      ) {
-        options.orientationOptions = this.config.orientationOptions;
-      }
-      if (
-        this.config.orientationDefault !== defaultOptions.orientationDefault
-      ) {
-        options.orientationDefault = this.config.orientationDefault;
-      }
-      if (this.config.allowTitle !== defaultOptions.allowTitle) {
-        options.allowTitle = this.config.allowTitle;
-      }
-      if (this.config.allowDescription !== defaultOptions.allowDescription) {
-        options.allowDescription = this.config.allowDescription;
-      }
-      if (this.config.printLogo !== defaultOptions.printLogo) {
-        options.printLogo = this.config.printLogo;
-      }
-      if (this.config.printMapInfo !== defaultOptions.printMapInfo) {
-        options.printMapInfo = this.config.printMapInfo;
-      }
-      if (this.config.resolutionList !== defaultOptions.resolutionList) {
-        options.resolutionList = this.config.resolutionList;
-      }
-      if (this.config.resolutionDefault !== defaultOptions.resolutionDefault) {
-        options.resolutionDefault = this.config.resolutionDefault;
-      }
-      if (this.config.contactDetails) {
-        options.contactDetails = this.config.contactDetails;
-      }
-      if (this.config.printCopyright !== defaultOptions.printCopyright) {
-        options.printCopyright = this.config.printCopyright;
-      }
+
+      Object.keys(defaultOptions).forEach((key) => {
+        if (!deepEqual(this.config[key], defaultOptions[key])) {
+          options[key] = structuredClone(this.config[key]);
+        }
+      });
       return options;
     },
     /**
