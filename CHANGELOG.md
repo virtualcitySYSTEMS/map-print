@@ -1,3 +1,7 @@
+# v2.0.2
+
+- Fixes a bug where the App logo would not be printed in PDF
+
 # v2.0.1
 
 - Adds input validation to config editor and ensures correct types for default values.

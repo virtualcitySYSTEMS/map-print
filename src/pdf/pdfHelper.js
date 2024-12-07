@@ -43,7 +43,7 @@ export function formatContactInfo(app, contactInfo) {
 export async function getLogo(app) {
   const logo = new Image();
   logo.crossOrigin = 'anonymous';
-  const mapLogo = app.uiConfig?.config?.value?.logo;
+  const mapLogo = app.uiConfig?.config?.logo;
   const logoSrc = mapLogo ?? VcsDefaultLogo;
   // .svg file extension, <svg tag OR image/svg as in base64 encoded svg files.
   if (/([.<]|%3C)svg/gi.test(logoSrc) || /image\/svg/i.test(logoSrc)) {

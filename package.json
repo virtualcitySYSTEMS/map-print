@@ -50,8 +50,8 @@
     "jspdf": "^2.5.1"
   },
   "peerDependencies": {
-    "@vcmap/core": "^6.0.4",
-    "@vcmap/ui": "^6.0.6",
+    "@vcmap/core": "^6.0.6",
+    "@vcmap/ui": "^6.0.10",
     "vue": "~3.4.38",
     "vuetify": "^3.7.3"
   },
