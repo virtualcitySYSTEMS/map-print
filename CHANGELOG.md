@@ -1,3 +1,7 @@
+# v2.1.0-rc.0
+
+- Move render Screenshot functionality to the core.
+
 # v2.0.2
 
 - Fixes a bug where the App logo would not be printed in PDF

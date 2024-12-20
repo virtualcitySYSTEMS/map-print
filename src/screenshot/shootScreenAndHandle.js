@@ -1,5 +1,5 @@
 import { downloadURI } from '@vcmap/ui';
-import { renderScreenshot } from './screenshotCreator.js';
+import { renderScreenshot } from '@vcmap/core';
 
 /**
  * Function that creates a screenshot and applies the blobCreator function on the canvas which is returned by the screenshotCreator.
