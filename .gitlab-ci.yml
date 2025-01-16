@@ -23,6 +23,7 @@ build:
   <<: *job_definition
   script:
     - npm ci
+    - npm run ensure-types
   before_script:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
@@ -50,6 +51,22 @@ lint:
   stage: test
   script:
     - npm run lint
+
+type-check:
+  <<: *after_build_definition
+  stage: test
+  script:
+    - npm run type-check
+
+test:
+  <<: *after_build_definition
+  stage: test
+  script:
+    - npm run coverage -- --reporter junit --outputFile test-report.xml
+  coverage: '/^Statements\s*:\s*([^%]+)/'
+  artifacts:
+    reports:
+      junit: test-report.xml
 
 audit:
   <<: *after_build_definition
@@ -136,8 +153,9 @@ version:
   script:
     - npm version patch -m "%s [skip-ci]"
     - TAG=`git describe --abbrev=0`
-    - git push git@gitlab:vcsuite/npm/vcmap/print.git $TAG
-    - git push git@gitlab:vcsuite/npm/vcmap/print.git HEAD:$CI_COMMIT_REF_NAME
+    - echo git push git@gitlab:vcsuite/"$CI_PROJECT_PATH".git
+    - git push git@gitlab:"$CI_PROJECT_PATH".git $TAG
+    - git push git@gitlab:"$CI_PROJECT_PATH".git HEAD:$CI_COMMIT_REF_NAME
   before_script:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh

@@ -1,55 +1,60 @@
-import { ButtonLocation, createToggleAction, WindowSlot } from '@vcmap/ui';
+import {
+  ButtonLocation,
+  createToggleAction,
+  PluginConfigEditor,
+  VcsPlugin,
+  VcsUiApp,
+  WindowSlot,
+} from '@vcmap/ui';
 import deepEqual from 'fast-deep-equal';
-import { name, version, mapVersion } from '../package.json';
 import PdfWindow, { pdfWindowId } from './pdf/pdfWindow.vue';
 import ScreenshotWindow, {
   screenshotWindowId,
 } from './screenshot/screenshotWindow.vue';
-import { getConfigAndState, validate } from './common/configManager.js';
+import {
+  getConfigAndState,
+  validate,
+  PrintConfig,
+  PrintState,
+} from './common/configManager.js';
 import getDefaultOptions from './defaultOptions.js';
 import PrintConfigEditor from './PrintConfigEditor.vue';
+import { name, version, mapVersion } from '../package.json';
 
-/**
- * @param {Object} config - the configuration of this plugin instance, passed in from the app.
- * @returns {Object}
- */
-export default (config) => {
-  /** {@type import("@vcmap/ui").VcsUiApp | undefined} */
-  let app;
+export type PrintPlugin = VcsPlugin<PrintConfig, PrintState> & {
+  readonly config: Required<PrintConfig>;
+  readonly state: PrintState;
+};
+
+export default function plugin(options: PrintConfig): PrintPlugin {
+  let app: VcsUiApp | undefined;
+  let config: Required<PrintConfig>;
+  let state: PrintState;
+  let destroy = (): void => {};
   return {
-    get name() {
+    get name(): string {
       return name;
     },
-    get version() {
+    get version(): string {
       return version;
     },
-    get mapVersion() {
+    get mapVersion(): string {
       return mapVersion;
     },
-    /**
-     * @returns {PrintConfig}
-     */
-    get config() {
-      return this._pluginConfig;
+    get config(): Required<PrintConfig> {
+      return config;
     },
-    /**
-     * @returns {PrintState}
-     */
-    get state() {
-      return this._pluginState;
+    get state(): PrintState {
+      return state;
     },
-    initialize(vcsUiApp) {
+    initialize(vcsUiApp: VcsUiApp): Promise<void> {
       app = vcsUiApp;
-      validate(config);
-      const { pluginConfig, pluginState } = getConfigAndState(
-        config,
-        getDefaultOptions(),
-      );
-      this._pluginConfig = pluginConfig;
-      this._pluginState = pluginState;
+      validate(options);
+      ({ config, state } = getConfigAndState(options, getDefaultOptions()));
+      return Promise.resolve();
     },
-    onVcsAppMounted: async (vcsUiApp) => {
-      let { action } = createToggleAction(
+    onVcsAppMounted(vcsUiApp: VcsUiApp): void {
+      const { action: pdfAction, destroy: pdfDestroy } = createToggleAction(
         {
           name: 'print.pdf.header',
           icon: '$vcsPdf',
@@ -72,57 +77,56 @@ export default (config) => {
         name,
       );
       vcsUiApp.navbarManager.add(
-        { id: pdfWindowId, action },
+        { id: pdfWindowId, action: pdfAction },
         name,
         ButtonLocation.SHARE,
       );
-      ({ action } = createToggleAction(
-        {
-          name: 'print.image.header',
-          icon: '$vcsScreenshot',
-          title: 'print.image.tooltip',
-        },
-        {
-          id: screenshotWindowId,
-          component: ScreenshotWindow,
-          slot: WindowSlot.DYNAMIC_RIGHT,
-          state: {
-            headerTitle: 'print.image.header',
-            headerIcon: '$vcsScreenshot',
-            infoUrlCallback: vcsUiApp.getHelpUrlCallback(
-              '/components/genericFunctions.html#id_viewShare',
-            ),
-            styles: { width: '280px', height: 'auto' },
+      const { action: screenshotAction, destroy: screenshotDestroy } =
+        createToggleAction(
+          {
+            name: 'print.image.header',
+            icon: '$vcsScreenshot',
+            title: 'print.image.tooltip',
           },
-        },
-        vcsUiApp.windowManager,
-        name,
-      ));
+          {
+            id: screenshotWindowId,
+            component: ScreenshotWindow,
+            slot: WindowSlot.DYNAMIC_RIGHT,
+            state: {
+              headerTitle: 'print.image.header',
+              headerIcon: '$vcsScreenshot',
+              infoUrlCallback: vcsUiApp.getHelpUrlCallback(
+                '/components/genericFunctions.html#id_viewShare',
+              ),
+              styles: { width: '280px', height: 'auto' },
+            },
+          },
+          vcsUiApp.windowManager,
+          name,
+        );
       vcsUiApp.navbarManager.add(
-        { id: screenshotWindowId, action },
+        { id: screenshotWindowId, action: screenshotAction },
         name,
         ButtonLocation.SHARE,
       );
+      destroy = (): void => {
+        pdfDestroy();
+        screenshotDestroy();
+      };
     },
-    /**
-     * @returns {PrintConfig}
-     */
-    toJSON() {
+    getDefaultOptions,
+    toJSON(): PrintConfig {
       const defaultOptions = getDefaultOptions();
-      const options = {};
+      const serial: PrintConfig = {};
 
-      Object.keys(defaultOptions).forEach((key) => {
+      (Object.keys(options) as Array<keyof PrintConfig>).forEach((key) => {
         if (!deepEqual(this.config[key], defaultOptions[key])) {
-          options[key] = structuredClone(this.config[key]);
+          serial[key] = structuredClone(this.config[key]);
         }
       });
-      return options;
+      return serial;
     },
-    /**
-     * @returns {PrintConfig}
-     */
-    getDefaultOptions,
-    getConfigEditors() {
+    getConfigEditors(): PluginConfigEditor<object>[] {
       return [
         {
           component: PrintConfigEditor,
@@ -262,5 +266,6 @@ export default (config) => {
         },
       },
     },
+    destroy,
   };
-};
+}

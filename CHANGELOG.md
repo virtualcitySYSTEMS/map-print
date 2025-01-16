@@ -1,6 +1,7 @@
 # v2.1.0-rc.0
 
-- Move render Screenshot functionality to the core.
+- Convert Print plugin to TypeScript
+- Move render Screenshot functionality to @vcmap/core.
 
 # v2.0.2
 

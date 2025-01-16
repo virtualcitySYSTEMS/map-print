@@ -19,7 +19,10 @@
               multiple
               :items="['A5', 'A4', 'A3', 'A2']"
               v-model="localConfig.formatList"
-              @update:modelValue="(v) => updateDefault('formatDefault', v)"
+              @update:modelValue="
+                (v: ('A2' | 'A3' | 'A4' | 'A5')[]) =>
+                  updateDefault('formatDefault', v)
+              "
             />
           </v-col>
         </v-row>
@@ -34,7 +37,7 @@
               id="formatDefault"
               :items="localConfig.formatList"
               v-model="localConfig.formatDefault"
-              :rules="[(v) => !!v || 'components.validation.required']"
+              :rules="[(v: string) => !!v || 'components.validation.required']"
             />
           </v-col>
         </v-row>
@@ -51,8 +54,12 @@
               type="number"
               placeholder="300"
               v-model="localConfig.ppiList"
-              @update:modelValue="(v) => updateDefault('ppiDefault', v)"
-              :rules="[(v) => v > 0 || 'components.validation.notValid']"
+              @update:modelValue="
+                (v: number[]) => updateDefault('ppiDefault', v)
+              "
+              :rules="[
+                (v: number) => v > 0 || 'components.validation.notValid',
+              ]"
             />
           </v-col>
         </v-row>
@@ -67,7 +74,7 @@
               id="ppiDefault"
               :items="localConfig.ppiList"
               v-model.number="localConfig.ppiDefault"
-              :rules="[(v) => !!v || 'components.validation.required']"
+              :rules="[(v: number) => !!v || 'components.validation.required']"
             />
           </v-col>
         </v-row>
@@ -99,17 +106,7 @@
             />
           </v-col>
         </v-row>
-        <v-row
-          no-gutters
-          v-for="key in [
-            'allowTitle',
-            'allowDescription',
-            'printLogo',
-            'printMapInfo',
-            'printCopyright',
-          ]"
-          :key="key"
-        >
+        <v-row no-gutters v-for="key in configKeys" :key="key">
           <v-col class="pl-1">
             <VcsCheckbox
               :id="key"
@@ -132,20 +129,7 @@
           </v-col>
         </v-row>
         <template v-if="printContactDetails">
-          <v-row
-            no-gutters
-            v-for="key in [
-              'department',
-              'name',
-              'streetAddress',
-              'zipAndCity',
-              'country',
-              'mail',
-              'phone',
-              'fax',
-            ]"
-            :key="key"
-          >
+          <v-row no-gutters v-for="key in contactKeys" :key="key">
             <v-col class="pl-5">
               <VcsLabel :html-for="key">
                 {{ $st(`print.editor.contactDetails.${key}`) }}
@@ -155,7 +139,7 @@
               <VcsTextField
                 :id="key"
                 clearable
-                v-model="localConfig.contactDetails[key]"
+                v-model="localConfig.contactDetails![key]"
               />
             </v-col>
           </v-row>
@@ -182,8 +166,12 @@
               placeholder="1920"
               type="number"
               v-model="localConfig.resolutionList"
-              @update:modelValue="(v) => updateDefault('resolutionDefault', v)"
-              :rules="[(v) => v > 0 || 'components.validation.notValid']"
+              @update:modelValue="
+                (v: number[]) => updateDefault('resolutionDefault', v)
+              "
+              :rules="[
+                (v: number) => v > 0 || 'components.validation.notValid',
+              ]"
             />
           </v-col>
         </v-row>
@@ -198,7 +186,7 @@
               id="resolutionDefault"
               :items="localConfig.resolutionList"
               v-model.number="localConfig.resolutionDefault"
-              :rules="[(v) => !!v || 'components.validation.required']"
+              :rules="[(v: number) => !!v || 'components.validation.required']"
             />
           </v-col>
         </v-row>
@@ -207,7 +195,7 @@
   </AbstractConfigEditor>
 </template>
 
-<script>
+<script lang="ts">
   import { VContainer, VRow, VCol } from 'vuetify/components';
   import {
     AbstractConfigEditor,
@@ -218,10 +206,11 @@
     VcsCheckbox,
     VcsChipArrayInput,
   } from '@vcmap/ui';
-  import { ref, toRaw } from 'vue';
+  import { defineComponent, PropType, ref, toRaw } from 'vue';
   import getDefaultOptions from './defaultOptions.js';
+  import { ContactInfo, PrintConfig } from './common/configManager.js';
 
-  export default {
+  export default defineComponent({
     name: 'PrintConfigEditor',
     components: {
       VContainer,
@@ -237,29 +226,28 @@
     },
     props: {
       getConfig: {
-        type: Function,
+        type: Function as PropType<() => PrintConfig>,
         required: true,
       },
       setConfig: {
-        type: Function,
+        type: Function as PropType<(config: object | undefined) => void>,
         required: true,
       },
     },
     setup(props) {
-      const localConfig = ref();
-      const printContactDetails = ref(false);
       const defaultOptions = getDefaultOptions();
       const config = props.getConfig();
-
-      localConfig.value = Object.assign(
-        structuredClone(defaultOptions),
-        config,
+      const localConfig = ref<PrintConfig>(
+        Object.assign(structuredClone(defaultOptions), config),
       );
 
-      printContactDetails.value =
-        config.contactDetails && Object.keys(config.contactDetails).length > 0;
-
+      const printContactDetails = ref(
+        !!(
+          config.contactDetails && Object.keys(config.contactDetails).length > 0
+        ),
+      );
       localConfig.value.contactDetails = config.contactDetails || {};
+
       const orientationOptionsItems = [
         {
           value: 'landscape',
@@ -275,16 +263,38 @@
         },
       ];
 
-      function updateDefault(prop, array) {
+      const configKeys = ref<(keyof Partial<PrintConfig>)[]>([
+        'allowTitle',
+        'allowDescription',
+        'printLogo',
+        'printMapInfo',
+        'printCopyright',
+      ]);
+
+      const contactKeys = ref<(keyof ContactInfo)[]>([
+        'department',
+        'name',
+        'streetAddress',
+        'zipAndCity',
+        'country',
+        'mail',
+        'phone',
+        'fax',
+      ]);
+
+      function updateDefault<T extends keyof PrintConfig>(
+        prop: T,
+        array: PrintConfig[T][],
+      ): void {
         if (!array.includes(localConfig.value[prop])) {
           localConfig.value[prop] = array[0];
         }
       }
 
-      const apply = async () => {
+      const apply = (): void => {
         if (
           !printContactDetails.value ||
-          Object.keys(localConfig.value.contactDetails).length === 0
+          Object.keys(localConfig.value.contactDetails ?? {}).length === 0
         ) {
           delete localConfig.value.contactDetails;
         }
@@ -295,11 +305,13 @@
         localConfig,
         orientationOptionsItems,
         printContactDetails,
+        contactKeys,
+        configKeys,
         updateDefault,
         apply,
       };
     },
-  };
+  });
 </script>
 
 <style scoped></style>

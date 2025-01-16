@@ -1,13 +1,30 @@
-/**
- * The font weight used by the pdfCreator
- * @enum {number}
- */
+/** The font weight used by the pdfCreator */
 export const FontWeights = {
   BOLD: 700,
   REGULAR: 400,
 };
+export type PageStyle = {
+  pageMargins: number[];
+  elementMargin: number;
+  'logo.scale': number;
+  'title.fontWeight': number;
+  'title.fontSize': number;
+  'title.widthPortion.portrait': number;
+  'title.widthPortion.landscape': number;
+  'title.maxLineCount.portrait': number;
+  'title.maxLineCount.landscape': number;
+  'description.fontWeight': number;
+  'description.fontSize': number;
+  'description.lineHeight': number;
+  'description.maxLineCount.portrait': number;
+  'description.maxLineCount.landscape': number;
+  'info.fontWeight': number;
+  'info.fontSize': number;
+  'info.widthPortion.portrait': number;
+  'info.widthPortion.landscape': number;
+};
 
-export const pageStyles = {
+export const pageStyles: { default: PageStyle; A5: Partial<PageStyle> } = {
   default: {
     // margin of page in inches
     pageMargins: [0.4, 0.4, 0.4, 0.4],

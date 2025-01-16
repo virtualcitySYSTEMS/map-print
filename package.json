@@ -2,7 +2,8 @@
   "name": "@vcmap/print",
   "version": "2.1.0-rc.0",
   "description": "VC Map Plugin for taking screenshots and creating PDFs of the current view of the map.",
-  "main": "src/index.js",
+  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "prepublishOnly": "vcmplugin build",
     "build": "vcmplugin build",
@@ -13,7 +14,11 @@
     "lint:js": "eslint . --ext .vue,.js,.cjs,.mjs,.ts,.cts,.mts",
     "lint:prettier": "prettier --check .",
     "lint": "npm run lint:js && npm run lint:prettier",
-    "format": "prettier --write --list-different . && npm run lint:js -- --fix"
+    "format": "prettier --write --list-different . && npm run lint:js -- --fix",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "type-check": "vue-tsc --noEmit",
+    "ensure-types": "vcmplugin ensure-types"
   },
   "author": "Tobias Krauth <tkrauth@vc.systems>",
   "license": "MIT",
@@ -35,7 +40,8 @@
   },
   "eslintIgnore": [
     "node_modules",
-    "dist"
+    "dist",
+    "plugin-assets"
   ],
   "eslintConfig": {
     "root": true,
@@ -47,21 +53,29 @@
     "@vcsuite/logger": "^1.0.1",
     "@vcsuite/parsers": "^1.0.3",
     "fast-deep-equal": "3.1.3",
-    "jspdf": "^2.5.1"
+    "jspdf": "^2.5.2"
   },
   "peerDependencies": {
-    "@vcmap/core": "^6.1.0-rc.1",
-    "@vcmap/ui": "^6.1.0-rc.1",
+    "@vcmap/core": "git+ssh://git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/core.git#main",
+    "@vcmap/ui": "git+ssh://git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/ui.git#main",
     "vue": "~3.4.38",
     "vuetify": "^3.7.3"
   },
   "overrides": {
-    "@vcmap/core": "^6.1.0-rc.1",
-    "@vcmap/ui": "^6.1.0-rc.1"
+    "@vcmap/core": "git+ssh://git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/core.git#main",
+    "@vcmap/ui": "git+ssh://git@gitlab.virtualcitysystems.de:vcsuite/npm/vcmap/ui.git#main"
   },
   "devDependencies": {
     "@vcmap/plugin-cli": "^4.0.1",
-    "@vcsuite/eslint-config": "^3.0.8"
+    "@vcsuite/eslint-config": "^3.0.8",
+    "@vitest/coverage-v8": "^2.1.8",
+    "jest-canvas-mock": "^2.5.2",
+    "jsdom": "^24.1.1",
+    "resize-observer-polyfill": "^1.5.1",
+    "typescript": "^5.7.2",
+    "vite-plugin-vuetify": "^2.0.3",
+    "vitest": "^2.1.8",
+    "vue-tsc": "^2.1.10"
   },
   "mapVersion": "^6.1"
 }
