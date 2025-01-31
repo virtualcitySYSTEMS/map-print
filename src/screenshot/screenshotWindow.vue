@@ -27,9 +27,7 @@
     <v-divider />
     <div class="d-flex w-full justify-end px-2 pt-2 pb-1">
       <VcsFormButton @click="createJPG()" variant="filled">
-        <span class="text-uppercase">
-          {{ $t('print.image.createButton') }}
-        </span>
+        {{ $t('print.image.createButton') }}
       </VcsFormButton>
     </div>
   </div>

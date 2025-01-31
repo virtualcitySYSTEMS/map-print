@@ -1,4 +1,8 @@
-import { OrientationOptions, PrintConfig } from './common/configManager.js';
+import {
+  LegendOrientationOptions,
+  OrientationOptions,
+  PrintConfig,
+} from './common/configManager.js';
 
 export default (): Required<PrintConfig> => {
   return {
@@ -16,5 +20,8 @@ export default (): Required<PrintConfig> => {
     resolutionDefault: 1280,
     contactDetails: {},
     printCopyright: true,
+    printLegend: true,
+    legendOrientation: LegendOrientationOptions.SAME_AS_MAP,
+    legendFormat: 'sameAsMap',
   };
 };

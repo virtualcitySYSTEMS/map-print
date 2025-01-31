@@ -2,6 +2,8 @@
 
 - Convert Print plugin to TypeScript
 - Move render Screenshot functionality to @vcmap/core.
+- Adds Legend printing option.
+- Fixes a bug where a same Copyright entry could be printed multiple times.
 
 # v2.0.2
 

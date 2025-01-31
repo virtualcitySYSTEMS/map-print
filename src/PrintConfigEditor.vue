@@ -101,7 +101,9 @@
           <v-col>
             <VcsSelect
               id="orientationDefault"
-              :items="orientationOptionsItems.slice(0, 2)"
+              :items="
+                orientationOptionsItems.filter(({ value }) => value !== 'both')
+              "
               v-model="localConfig.orientationDefault"
             />
           </v-col>
@@ -117,6 +119,37 @@
             />
           </v-col>
         </v-row>
+        <!-- Legend config -->
+        <span v-if="localConfig.printLegend">
+          <v-row no-gutters class="pl-5">
+            <v-col>
+              <VcsLabel html-for="legendOrientation">
+                {{ $t('print.editor.orientation.title') }}
+              </VcsLabel>
+            </v-col>
+            <v-col>
+              <VcsSelect
+                id="legendOrientation"
+                :items="legendOrientationOptions"
+                v-model="localConfig.legendOrientation"
+              />
+            </v-col>
+          </v-row>
+          <v-row no-gutters class="pl-5">
+            <v-col>
+              <VcsLabel html-for="legendFormat">
+                {{ $t('print.editor.format') }}
+              </VcsLabel>
+            </v-col>
+            <v-col>
+              <VcsSelect
+                id="legendFormat"
+                :items="legendFormatOptions"
+                v-model="localConfig.legendFormat"
+              />
+            </v-col>
+          </v-row>
+        </span>
         <v-row no-gutters>
           <v-col class="pl-1">
             <VcsCheckbox
@@ -208,7 +241,13 @@
   } from '@vcmap/ui';
   import { defineComponent, PropType, ref, toRaw } from 'vue';
   import getDefaultOptions from './defaultOptions.js';
-  import { ContactInfo, PrintConfig } from './common/configManager.js';
+  import {
+    ContactInfo,
+    LegendOrientationOptions,
+    OrientationOptions,
+    PrintConfig,
+  } from './common/configManager.js';
+  import standardPageSizes from './pdf/standardPageSizes.js';
 
   export default defineComponent({
     name: 'PrintConfigEditor',
@@ -248,19 +287,26 @@
       );
       localConfig.value.contactDetails = config.contactDetails || {};
 
-      const orientationOptionsItems = [
-        {
-          value: 'landscape',
-          title: 'print.editor.orientation.landscape',
+      const orientationOptionsItems = Object.values(OrientationOptions).map(
+        (value) => {
+          return { value, title: `print.editor.orientation.${value}` };
         },
+      );
+
+      const legendOrientationOptions = Object.values(
+        LegendOrientationOptions,
+      ).map((value) => {
+        return { value, title: `print.editor.orientation.${value}` };
+      });
+
+      const legendFormatOptions = [
         {
-          value: 'portrait',
-          title: 'print.editor.orientation.portrait',
+          value: 'sameAsMap',
+          title: 'print.editor.sameFormatAsMap',
         },
-        {
-          value: 'both',
-          title: 'print.editor.orientation.both',
-        },
+        ...Object.keys(standardPageSizes).map((value) => {
+          return { value, title: value };
+        }),
       ];
 
       const configKeys = ref<(keyof Partial<PrintConfig>)[]>([
@@ -269,6 +315,7 @@
         'printLogo',
         'printMapInfo',
         'printCopyright',
+        'printLegend',
       ]);
 
       const contactKeys = ref<(keyof ContactInfo)[]>([
@@ -304,6 +351,8 @@
       return {
         localConfig,
         orientationOptionsItems,
+        legendOrientationOptions,
+        legendFormatOptions,
         printContactDetails,
         contactKeys,
         configKeys,

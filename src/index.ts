@@ -149,6 +149,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             resolution: 'Auflösung',
             portrait: 'Hochformat',
             landscape: 'Querformat',
+            printLegend: 'Legende drucken',
             titlePlaceholder: 'Titel',
             descriptionPlaceholder: 'Beschreibung (mehrzeilig möglich)',
             createButton: 'Erstellen',
@@ -162,6 +163,8 @@ export default function plugin(options: PrintConfig): PrintPlugin {
               mapInfo: 'Karteninformation',
               centerCoordinate: 'Mittelpunkt (WGS84)',
             },
+            iframeNotSupported:
+              'Aufgrund technischer Beschränkungen können Legendenelemente des Typs Iframe nicht gedruckt werden.',
           },
           image: {
             tooltip: 'Bilddatei (JPG) der aktuellen Ansicht erstellen',
@@ -170,6 +173,8 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             createButton: 'Erstellen',
           },
           editor: {
+            format: 'Papierformat',
+            sameFormatAsMap: 'Gleich wie Karte',
             formatList: 'Verfügbare Papierformate',
             formatDefault: 'Standard Papierformat',
             ppiList: 'Verfügbare Auflösungen (PPI)',
@@ -177,9 +182,11 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             orientationOptions: 'Verfügbare Orientierungen',
             orientationDefault: 'Standard Orientierung',
             orientation: {
+              title: 'Orientierung',
               portrait: 'Hochformat',
               landscape: 'Querformat',
               both: 'Hochformat & Querformat',
+              sameAsMap: 'Gleich wie Karte',
             },
             allowTitle: 'Eingabefeld Titel anzeigen',
             allowDescription: 'Eingabefeld Beschreibung anzeigen',
@@ -187,6 +194,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printMapInfo: 'Karteninformation anzeigen',
             printContactDetails: 'Kontaktinformationen anzeigen',
             printCopyright: 'Copyright anzeigen',
+            printLegend: 'Legende anzeigen',
             contactDetails: {
               department: 'Abteilung',
               name: 'Name',
@@ -212,6 +220,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             resolution: 'Resolution',
             portrait: 'Portrait',
             landscape: 'Landscape',
+            printLegend: 'Print legend',
             titlePlaceholder: 'Title',
             descriptionPlaceholder: 'Description (multiline possible)',
             createButton: 'Create',
@@ -225,6 +234,8 @@ export default function plugin(options: PrintConfig): PrintPlugin {
               mapInfo: 'Map information',
               centerCoordinate: 'Center (WGS84)',
             },
+            iframeNotSupported:
+              'Due to technical limitations, legend items of type Iframe cannot be printed.',
           },
           image: {
             tooltip: 'Create image file (JPG) of current view',
@@ -233,6 +244,8 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             createButton: 'Create',
           },
           editor: {
+            format: 'Paper size',
+            sameFormatAsMap: 'Same as the map',
             formatList: 'Available paper sizes',
             formatDefault: 'Default paper size',
             ppiList: 'Available resolutions (PPI)',
@@ -240,9 +253,11 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             orientationOptions: 'Available orientations',
             orientationDefault: 'Default orientation',
             orientation: {
+              title: 'Orientation',
               portrait: 'Portrait',
               landscape: 'Landscape',
               both: 'Portrait & Landscape',
+              sameAsMap: 'Same as the map',
             },
             allowTitle: 'Show title input',
             allowDescription: 'Show description input',
@@ -250,6 +265,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printMapInfo: 'Show map information',
             printContactDetails: 'Show contact details',
             printCopyright: 'Show copyright',
+            printLegend: 'Show legend',
             contactDetails: {
               department: 'Department',
               name: 'Name',

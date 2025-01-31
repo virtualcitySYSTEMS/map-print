@@ -16,6 +16,18 @@ export enum OrientationOptions {
   BOTH = 'both',
 }
 
+/** Enumeration of allowed orientations for the legend. */
+export enum LegendOrientationOptions {
+  /** Always same orientation as the one choosed by the user. */
+  SAME_AS_MAP = 'sameAsMap',
+  /** Always landscape orientation. */
+  LANDSCAPE = 'landscape',
+  /** Always portrait orientation. */
+  PORTRAIT = 'portrait',
+}
+
+export type LegendFormatOptions = keyof typeof standardPageSizes | 'sameAsMap';
+
 /** Contact information printed on pdf. */
 export type ContactInfo = {
   /** The department */
@@ -80,6 +92,12 @@ export type PrintConfig = {
   contactDetails?: ContactInfo;
   /** Whether copyright should be printed on pdf or not. */
   printCopyright?: boolean;
+  /** Whether legend should be printed on pdf or not. */
+  printLegend?: boolean;
+  /** The page orienation for the legend entries. */
+  legendOrientation?: LegendOrientationOptions;
+  /** The page format for the legend entries. */
+  legendFormat?: LegendFormatOptions;
 };
 
 export type PrintState = {
@@ -187,6 +205,27 @@ export function getConfigAndState(
   );
 
   /**
+   * Whether legend should be printed on pdf or not.
+   */
+  const printLegend: boolean = parseBoolean(
+    config.printLegend,
+    defaultOptions.printLegend,
+  );
+  /**
+   * @example "sameAsMap"
+   */
+  const legendOrientation: LegendOrientationOptions = parseEnumValue(
+    config.legendOrientation,
+    LegendOrientationOptions,
+    defaultOptions.legendOrientation,
+  );
+  /**
+   * @example "sameAsMap"
+   */
+  const legendFormat: LegendFormatOptions =
+    config.legendFormat || defaultOptions.legendFormat;
+
+  /**
    * Whether map information should be printed on pdf or not.
    */
   const printMapInfo: boolean = parseBoolean(
@@ -228,6 +267,9 @@ export function getConfigAndState(
       allowDescription,
       printLogo,
       printCopyright,
+      printLegend,
+      legendOrientation,
+      legendFormat,
       printMapInfo,
       contactDetails,
       // screenshot
@@ -268,6 +310,12 @@ export function validate(options: PrintConfig): void {
     check(options.allowDescription, maybe(Boolean));
     check(options.printLogo, maybe(Boolean));
     check(options.printCopyright, maybe(Boolean));
+    check(options.printLegend, maybe(Boolean));
+    check(
+      options.legendFormat,
+      maybe(oneOf(...Object.keys(standardPageSizes), 'sameAsMap')),
+    );
+    check(options.legendOrientation, maybe(ofEnum(LegendOrientationOptions)));
     check(options.printMapInfo, maybe(Boolean));
     check(options.resolutionList, maybe([Number]));
     const resolutionList =

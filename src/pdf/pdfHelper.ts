@@ -1,9 +1,17 @@
-// @ts-expect-error {no exported member VcsDefaultLogo because of bug in UI. Issue 664}
-import { getAttributions, VcsDefaultLogo, VcsUiApp } from '@vcmap/ui';
+import {
+  getAttributions,
+  ImageLegendItem,
+  LegendType,
+  NotificationType,
+  // @ts-expect-error {no exported member VcsDefaultLogo because of bug in UI. Issue 664}
+  VcsDefaultLogo,
+  VcsUiApp,
+} from '@vcmap/ui';
 import { getLogger } from '@vcsuite/logger';
+import { FeatureLayer, Layer } from '@vcmap/core';
 import { svgToPng } from '../common/util.js';
 import { ContactInfo } from '../common/configManager.js';
-import { TextWithHeader } from './pdfCreator.js';
+import { LegendEntries, LegendItems, TextWithHeader } from './pdfCreator.js';
 import { name } from '../../package.json';
 
 /**
@@ -95,7 +103,7 @@ export async function getMapInfo(
 export function getCopyright(app: VcsUiApp): string | undefined {
   const copyrightEntries = getAttributions(app).entries;
   if (copyrightEntries) {
-    let copyright = copyrightEntries
+    const copyright = copyrightEntries
       .map((entry) => {
         let provider;
         let year;
@@ -109,13 +117,76 @@ export function getCopyright(app: VcsUiApp): string | undefined {
         }
         return '';
       })
-      .filter(Boolean)
-      .join(' | ');
+      .filter(Boolean);
 
-    if (copyright[copyright.length - 1] === '| ') {
-      copyright = copyright.slice(0, copyright.length - 2);
+    let filtered = [...new Set(copyright)].join(' | ');
+    if (filtered[filtered.length - 1] === '| ') {
+      filtered = filtered.slice(0, filtered.length - 2);
     }
-    return copyright;
+    return filtered;
+  }
+  return undefined;
+}
+
+/**
+ * @param app The VcsUiApp.
+ * @returns The active layers with a legend.
+ */
+export function getActiveLegends(app: VcsUiApp): Layer[] {
+  return [...app.layers].filter(
+    (l) =>
+      l.active &&
+      l.isSupported(app.maps.activeMap!) &&
+      (l.properties?.legend ||
+        (l instanceof FeatureLayer && l.style?.properties?.legend)),
+  );
+}
+
+/**
+ * Get all legend items from active and supported layers.
+ * @param app The VcsUiApp.
+ * @returns An array of object, with the layer title and its legend.
+ */
+export function getLegendItems(app: VcsUiApp): LegendItems | undefined {
+  const activeLayersWithLegend = getActiveLegends(app);
+  if (activeLayersWithLegend.length) {
+    return activeLayersWithLegend.map((l) => {
+      const layerTitle = app.vueI18n.t(
+        (l.properties?.title ?? l.name) as string,
+      );
+      const legends = (
+        l instanceof FeatureLayer && l.style?.properties?.legend
+          ? l.style?.properties?.legend
+          : l.properties?.legend
+      ) as LegendEntries;
+      const localizedLegends = legends
+        .filter((legend) => {
+          if (legend.type === LegendType.Iframe) {
+            app.notifier.add({
+              type: NotificationType.INFO,
+              title: layerTitle,
+              message: app.vueI18n.t('print.pdf.iframeNotSupported'),
+            });
+            return false;
+          }
+          return true;
+        })
+        .map((legend) => {
+          let src;
+          if (legend.type === LegendType.Image) {
+            src = app.vueI18n.t((legend as ImageLegendItem).src);
+          }
+          return {
+            ...legend,
+            ...(src && { src }),
+          };
+        });
+
+      return {
+        title: layerTitle,
+        legends: localizedLegends as LegendEntries,
+      };
+    });
   }
   return undefined;
 }

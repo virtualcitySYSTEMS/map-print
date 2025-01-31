@@ -1,25 +1,28 @@
+import { IframeLegendItem, ImageLegendItem, StyleLegendItem } from '@vcmap/ui';
 import { jsPDF } from 'jspdf';
 import pageSizes from './standardPageSizes.js';
 import { pageStyles, FontWeights, PageStyle } from './styles.js';
 import {
   contactKeysPattern,
+  LegendOrientationOptions,
   OrientationOptions,
 } from '../common/configManager.js';
 import getDefaultOptions from '../defaultOptions.js';
+import { addLayerLegend } from './pdfLegendHelper.js';
 
 /** 2D coordinates. Origin is upper left corner. */
-type Coords = {
+export type Coords = {
   x: number;
   y: number;
 };
 
 /** Dimension of Element */
-type Size = {
+export type Size = {
   width: number;
   height: number;
 };
 
-type ElementPlacement = {
+export type ElementPlacement = {
   /**  Coordinates of upper left corner in inches. Origin is upper left corner of pdf document. */
   coords: Coords;
   /** width and height */
@@ -29,6 +32,25 @@ type ElementPlacement = {
 export type TextWithHeader = {
   header: string;
   text: Array<string>;
+};
+
+export type LegendEntries = Array<
+  IframeLegendItem | ImageLegendItem | StyleLegendItem
+>;
+
+export type LegendItems = Array<{
+  title: string;
+  legends: LegendEntries;
+}>;
+
+type Legend = {
+  config: {
+    format: keyof typeof pageSizes;
+    orientation:
+      | LegendOrientationOptions.LANDSCAPE
+      | LegendOrientationOptions.PORTRAIT;
+  };
+  items: LegendItems;
 };
 
 type PDFCreatorOptions = {
@@ -50,6 +72,8 @@ type PDFCreatorOptions = {
   mapInfo?: TextWithHeader;
   /** Information about the copyright. */
   copyright?: string;
+  /** Information about the legend. */
+  legend?: Legend;
   /** Paths to bold and regular weight for named font. */
   fonts?: { name: string; bold: string; regular: string };
 };
@@ -143,6 +167,12 @@ export default class PDFCreator {
 
   /** Position and dimensions of the copyright. */
   copyrightPlacement?: ElementPlacement;
+
+  /** Legend config and items. */
+  legend?: Legend;
+
+  /** The current layer for which a legend page is being added */
+  currentLayerTitle?: string;
 
   /**
    * Calculates the positioning of the elements to be placed on the PDF.
@@ -260,6 +290,10 @@ export default class PDFCreator {
       this.copyrightPlacement = this._calcCopyrightPlacement(
         pdfCreatorOptions.copyright,
       );
+    }
+
+    if (pdfCreatorOptions.legend) {
+      this.legend = pdfCreatorOptions.legend;
     }
 
     this.initialized = true;
@@ -520,7 +554,7 @@ export default class PDFCreator {
     };
   }
 
-  _calcCopyrightPlacement(copyright: string): ElementPlacement {
+  private _calcCopyrightPlacement(copyright: string): ElementPlacement {
     this._setTextStyle('info');
     this.pdfDoc.setFontSize(6);
     const lines: string[] = this.pdfDoc.splitTextToSize(
@@ -548,11 +582,41 @@ export default class PDFCreator {
   }
 
   /**
+   * Adds a page to the PDF document, on which is added the title of the layer
+   * whose legend entries are being added. Sets the text style to `info`.
+   * @returns The title height.
+   */
+  private _addLegendPage(): number {
+    this.pdfDoc.addPage(
+      this.legend!.config.format,
+      this.legend!.config.orientation,
+    );
+    this._setTextStyle('title');
+    this.pdfDoc.setFontSize(12);
+    const maxWidth =
+      this.pdfSize.width -
+      this.formatting.pageMargins[1] -
+      this.formatting.pageMargins[3];
+    this.pdfDoc.text(
+      this.currentLayerTitle!,
+      this.formatting.pageMargins[1],
+      this.formatting.pageMargins[0],
+      { baseline: 'top', maxWidth },
+    );
+    // Add legend items
+    const titleHeight = this.pdfDoc.getTextDimensions(
+      this.currentLayerTitle!,
+    ).h;
+    this._setTextStyle('info');
+    return titleHeight;
+  }
+
+  /**
    * Creates a PDF file using the data from the init function as well as the input canvas. init() needs to be executed first.
    * @param canvas Canvas with screenshot of map.
    * @returns The created PDF as blob.
    */
-  create(canvas: HTMLCanvasElement): Promise<Blob> {
+  async create(canvas: HTMLCanvasElement): Promise<Blob> {
     if (!this.initialized) {
       throw new Error(
         'pdfCreator instance needs first to be initialized by calling init method.',
@@ -663,6 +727,38 @@ export default class PDFCreator {
           this.descriptionPlacement!.coords.x,
           this.descriptionPlacement!.coords.y,
           { baseline: 'hanging' },
+        );
+      }
+    }
+
+    if (this.legend) {
+      const { format, orientation } = this.legend.config;
+      const isLandscape = orientation === LegendOrientationOptions.LANDSCAPE;
+      const size: Size = isLandscape
+        ? { width: pageSizes[format][1], height: pageSizes[format][0] }
+        : { width: pageSizes[format][0], height: pageSizes[format][1] };
+
+      const items = this.legend.items.filter((i) => !!i.legends.length);
+      for await (const legendEntry of items) {
+        this.currentLayerTitle = legendEntry.title;
+        const titleHeight = this._addLegendPage();
+        const legendConfig = {
+          size,
+          useColumns: isLandscape && legendEntry.legends.length > 1,
+          origin: {
+            x: this.formatting.pageMargins[3],
+            y:
+              this.formatting.pageMargins[0] +
+              titleHeight +
+              this.formatting.elementMargin,
+          },
+        };
+        await addLayerLegend(
+          this.pdfDoc,
+          this.formatting,
+          legendEntry.legends,
+          () => this._addLegendPage(),
+          legendConfig,
         );
       }
     }
