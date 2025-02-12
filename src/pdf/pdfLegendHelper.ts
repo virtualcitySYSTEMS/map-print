@@ -2,8 +2,7 @@ import {
   CircleLegendRow,
   FillLegendRow,
   IconLegendRow,
-  ImageLegendItem,
-  LegendType,
+  LegendItem,
   RegularShapeLegendRow,
   StrokeLegendRow,
   StyleLegendItem,
@@ -12,47 +11,11 @@ import {
 import { ColorType, getShapeFromOptions, parseColor } from '@vcmap/core';
 import { getLogger } from '@vcsuite/logger';
 import jsPDF from 'jspdf';
-import PDFCreator, {
-  Coords,
-  ElementPlacement,
-  LegendEntries,
-  Size,
-} from './pdfCreator.js';
+import PDFCreator, { Coords, ElementPlacement, Size } from './pdfCreator.js';
 import { PageStyle } from './styles.js';
-import { svgToPng } from '../common/util.js';
+import { createImageFromSrc } from '../common/util.js';
 import { name } from '../../package.json';
-
-/**
- * @param src The src of the image to be created.
- * @param maxHeight Optional - the maximum height of the image, for SVG files. If not set, the natural height of the image will be used.
- * @returns The created image, or undefined if the SVG conversion fails.
- */
-async function createImage(
-  src: string,
-  maxHeight?: number,
-): Promise<HTMLImageElement | undefined> {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  let svgSrc;
-  // .svg file extension, <svg tag OR image/svg as in base64 encoded svg files.
-  if (/([.<]|%3C)svg/gi.test(src) || /image\/svg/i.test(src)) {
-    svgSrc = await svgToPng(
-      src,
-      maxHeight ? maxHeight * PDFCreator.JSPDF_PPI : undefined,
-    ).catch((e) => {
-      getLogger(name).warning(
-        `An error occured while converting SVG to PNG: ${e}`,
-      );
-      return undefined;
-    });
-    if (!svgSrc) {
-      return undefined;
-    }
-  }
-  img.src = svgSrc ?? src;
-  await img.decode();
-  return img;
-}
+import { isImageLegendItem, isStyleLegendItem } from './pdfHelper.js';
 
 /**
  * Resizes the image to fit in the max dimensions of the passed geometry,
@@ -92,7 +55,7 @@ function sizeAndPrintImage(
   if (centerY) {
     y = placement.coords.y + (maxH - height) / 2;
   }
-  pdfDoc.addImage(img.src, 'PNG', x, y, width, height);
+  pdfDoc.addImage(img.src, x, y, width, height);
   return height;
 }
 
@@ -123,6 +86,7 @@ function setFillColor(pdfDoc: jsPDF, color?: ColorType): void {
  * @param styleItem The StyleLegend item to render.
  * @param pdfDoc The jsPdf document.
  * @param nextPage A callback to jump to the next page.
+ * @param translate A callback to translate the row title.
  * @param currentPlacement
  * @param originY
  * @returns The height of the StyleLegend on the PDF.
@@ -131,6 +95,7 @@ async function renderStyleLegend(
   styleItem: StyleLegendItem,
   pdfDoc: jsPDF,
   nextPage: () => void,
+  translate: (s: string) => string,
   currentPlacement: ElementPlacement,
   originY: number,
 ): Promise<number> {
@@ -218,7 +183,10 @@ async function renderStyleLegend(
       const legend = row as IconLegendRow;
       if (legend.image.src) {
         const placement = { coords: { x, y }, size: { ...itemSize } };
-        await createImage(legend.image.src, itemSize.height).then((img) => {
+        await createImageFromSrc(
+          legend.image.src,
+          itemSize.height * PDFCreator.JSPDF_PPI,
+        ).then((img) => {
           if (img) {
             sizeAndPrintImage(pdfDoc, img, placement, true);
           }
@@ -230,7 +198,10 @@ async function renderStyleLegend(
       const imageRep = shape.getImage(1);
       const src = imageRep.toDataURL();
       const placement = { coords: { x, y }, size: { ...itemSize } };
-      await createImage(src, itemSize.height).then((img) => {
+      await createImageFromSrc(
+        src,
+        itemSize.height * PDFCreator.JSPDF_PPI,
+      ).then((img) => {
         if (img) {
           sizeAndPrintImage(pdfDoc, img, placement, true);
         }
@@ -243,7 +214,10 @@ async function renderStyleLegend(
     }
 
     // Adds the row title next to its graphic part. Wrap it to the max available width.
-    const wrappedTitle = pdfDoc.splitTextToSize(row.title, titleMaxWidth);
+    const wrappedTitle = pdfDoc.splitTextToSize(
+      translate(row.title),
+      titleMaxWidth,
+    );
     const title = `${wrappedTitle[0]}${wrappedTitle.length > 1 ? ' ...' : ''}`;
     pdfDoc.text(title, x + itemSize.width + margin, y + itemSize.height / 2, {
       baseline: 'middle',
@@ -278,14 +252,16 @@ function drawSeparatingLine(
  * @param formatting The PDFCreator formatting.
  * @param legendItems The Legend Entries of a layer to be added.
  * @param addLegendPage A callback used to add a new page.
+ * @param translate A callback used to translate the row titles.
  * @param config The configuration of the Legend pages: top-left coords, size and whether to create two columns.
  */
 // eslint-disable-next-line import/prefer-default-export
 export async function addLayerLegend(
   pdfDoc: jsPDF,
   formatting: PageStyle,
-  legendItems: LegendEntries,
+  legendItems: LegendItem[],
   addLegendPage: () => number,
+  translate: (s: string) => string,
   config: {
     origin: Coords;
     size: Size;
@@ -345,17 +321,18 @@ export async function addLayerLegend(
       nextPage();
     }
     const currentPlacement = { coords: currentPos, size: currentSize };
-    if (legendItem.type === LegendType.Style) {
+    if (isStyleLegendItem(legendItem)) {
       await renderStyleLegend(
-        legendItem as StyleLegendItem,
+        legendItem,
         pdfDoc,
         nextPage,
+        translate,
         currentPlacement,
         config.origin.y,
       ).then(updateSizeAndPosition);
-    } else if (legendItem.type === LegendType.Image) {
-      const { src } = legendItem as ImageLegendItem;
-      await createImage(src)
+    } else if (isImageLegendItem(legendItem)) {
+      const { src } = legendItem;
+      await createImageFromSrc(src)
         .then((img) => {
           if (img) {
             const { naturalHeight: imgH } = img;

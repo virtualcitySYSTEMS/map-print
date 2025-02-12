@@ -1,4 +1,4 @@
-import { IframeLegendItem, ImageLegendItem, StyleLegendItem } from '@vcmap/ui';
+import { LegendItem } from '@vcmap/ui';
 import { jsPDF } from 'jspdf';
 import pageSizes from './standardPageSizes.js';
 import { pageStyles, FontWeights, PageStyle } from './styles.js';
@@ -34,13 +34,9 @@ export type TextWithHeader = {
   text: Array<string>;
 };
 
-export type LegendEntries = Array<
-  IframeLegendItem | ImageLegendItem | StyleLegendItem
->;
-
-export type LegendItems = Array<{
+export type PrintableLegendItems = Array<{
   title: string;
-  legends: LegendEntries;
+  legends: Array<LegendItem>;
 }>;
 
 type Legend = {
@@ -50,7 +46,7 @@ type Legend = {
       | LegendOrientationOptions.LANDSCAPE
       | LegendOrientationOptions.PORTRAIT;
   };
-  items: LegendItems;
+  items: PrintableLegendItems;
 };
 
 type PDFCreatorOptions = {
@@ -616,7 +612,10 @@ export default class PDFCreator {
    * @param canvas Canvas with screenshot of map.
    * @returns The created PDF as blob.
    */
-  async create(canvas: HTMLCanvasElement): Promise<Blob> {
+  async create(
+    canvas: HTMLCanvasElement,
+    translate: (s: string) => string,
+  ): Promise<Blob> {
     if (!this.initialized) {
       throw new Error(
         'pdfCreator instance needs first to be initialized by calling init method.',
@@ -758,6 +757,7 @@ export default class PDFCreator {
           this.formatting,
           legendEntry.legends,
           () => this._addLegendPage(),
+          translate,
           legendConfig,
         );
       }

@@ -96,8 +96,9 @@
 <style lang="scss" scoped></style>
 
 <script lang="ts">
-  import { defineComponent, inject, onUnmounted, ref } from 'vue';
+  import { computed, defineComponent, inject, onUnmounted, ref } from 'vue';
   import {
+    getLegendEntries,
     getPluginAssetUrl,
     NotificationType,
     VcsCheckbox,
@@ -126,8 +127,7 @@
     formatContactInfo,
     getMapInfo,
     getCopyright,
-    getLegendItems,
-    getActiveLegends,
+    parseLegend,
   } from './pdfHelper.js';
   import {
     LegendOrientationOptions,
@@ -160,14 +160,9 @@
       const plugin = app.plugins.getByKey(name) as PrintPlugin;
       const { config, state } = plugin;
 
-      const enableLegendPrinting = ref(
-        config.printLegend && !!getActiveLegends(app).length,
-      );
-      const layerStateListener = app.layers.stateChanged.addEventListener(
-        () => {
-          enableLegendPrinting.value =
-            config.printLegend && !!getActiveLegends(app).length;
-        },
+      const { entries: legendEntries, destroy } = getLegendEntries(app);
+      const enableLegendPrinting = computed(
+        () => config.printLegend && !!legendEntries.length,
       );
       const printLegend = ref(true);
 
@@ -217,7 +212,7 @@
          */
         let legend;
         if (enableLegendPrinting.value && printLegend.value) {
-          const items = getLegendItems(app);
+          const items = parseLegend(app, legendEntries);
           if (items?.length) {
             const format =
               !config.legendFormat || config.legendFormat === 'sameAsMap'
@@ -295,7 +290,7 @@
           });
       }
 
-      onUnmounted(layerStateListener);
+      onUnmounted(destroy);
 
       return {
         state,

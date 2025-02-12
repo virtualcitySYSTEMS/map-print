@@ -1,6 +1,8 @@
 import { CesiumMap, ObliqueMap, OpenlayersMap, VcsMap } from '@vcmap/core';
+import { getLogger } from '@vcsuite/logger';
 import DOMPurify from 'dompurify';
 import { Size } from '../pdf/pdfCreator.js';
+import { name } from '../../package.json';
 
 /**
  * @param input The SVG path.
@@ -42,43 +44,51 @@ async function getSizeFromViewBox(svgPath: string): Promise<Size> {
 }
 
 /**
- * Convert svg image to png.
- * @param svgPath The path to the svg image.
- * @param maxHeight Optional, the maximum height in pixels of the resulting png. If not set, the naturalHeight of the image will be used.
- * @returns png as base64 string.
- * @throws If the SVG aspect ratio cannot be determined.
+ * @param src The src of the image to be created.
+ * @param maxHeight Optional - the maximum height of the image, for SVG files. If not set, the natural height of the image will be used.
+ * @returns The created image, or undefined if the SVG conversion fails.
  */
-export async function svgToPng(
-  svgPath: string,
+export async function createImageFromSrc(
+  src: string,
   maxHeight?: number,
-): Promise<string> {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.src = svgPath;
-  await img.decode();
-  let aspectRatio;
-  let imgHeight;
-  if (img.width && img.height) {
-    // use width and height for aspect ratio, if available
-    aspectRatio = img.width / img.height;
-    imgHeight = img.height;
-  } else {
-    // if not, read viewBox (in Firefox if no width and height in svg tag)
-    const { height, width } = await getSizeFromViewBox(svgPath);
-    imgHeight = height;
-    aspectRatio = width / height;
+): Promise<HTMLImageElement | undefined> {
+  try {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    // .svg file extension, <svg tag OR image/svg as in base64 encoded svg files.
+    if (/([.<]|%3C)svg/gi.test(src) || /image\/svg/i.test(src)) {
+      img.src = src;
+      await img.decode();
+      let aspectRatio;
+      let imgHeight;
+      if (img.width && img.height) {
+        // use width and height for aspect ratio, if available
+        aspectRatio = img.width / img.height;
+        imgHeight = img.height;
+      } else {
+        // if not, read viewBox (in Firefox if no width and height in svg tag)
+        const { height, width } = await getSizeFromViewBox(src);
+        imgHeight = height;
+        aspectRatio = width / height;
+      }
+      const height = maxHeight ?? imgHeight;
+      const width = height * aspectRatio;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, width, height);
+      img.src = canvas.toDataURL('image/png');
+      await img.decode();
+      return img;
+    }
+    img.src = src;
+    await img.decode();
+    return img;
+  } catch (error) {
+    getLogger(name).error('Error while creating image: ', error);
+    return undefined;
   }
-  const height = maxHeight ?? imgHeight;
-  const width = height * aspectRatio;
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(img, 0, 0, width, height);
-  // clean up
-  img.remove();
-  // convert canvas to png and return
-  return canvas.toDataURL('image/png');
 }
 
 /**

@@ -1,17 +1,19 @@
 import {
   getAttributions,
   ImageLegendItem,
+  LegendEntry,
+  LegendItem,
   LegendType,
   NotificationType,
+  StyleLegendItem,
   // @ts-expect-error {no exported member VcsDefaultLogo because of bug in UI. Issue 664}
   VcsDefaultLogo,
   VcsUiApp,
 } from '@vcmap/ui';
 import { getLogger } from '@vcsuite/logger';
-import { FeatureLayer, Layer } from '@vcmap/core';
-import { svgToPng } from '../common/util.js';
+import { createImageFromSrc } from '../common/util.js';
 import { ContactInfo } from '../common/configManager.js';
-import { LegendEntries, LegendItems, TextWithHeader } from './pdfCreator.js';
+import { PrintableLegendItems, TextWithHeader } from './pdfCreator.js';
 import { name } from '../../package.json';
 
 /**
@@ -57,17 +59,12 @@ export function formatContactInfo(
  * @throws Will throw error if decoding failes.
  */
 export async function getLogo(app: VcsUiApp): Promise<HTMLImageElement> {
-  const logo = new Image();
-  logo.crossOrigin = 'anonymous';
   const mapLogo = app.uiConfig?.config?.logo ?? VcsDefaultLogo;
-  // .svg file extension, <svg tag OR image/svg as in base64 encoded svg files.
-  if (/([.<]|%3C)svg/gi.test(mapLogo) || /image\/svg/i.test(mapLogo)) {
-    // 120 px is the height of the logo in 300 dpi in portrait mode.
-    logo.src = await svgToPng(mapLogo, 120);
-  } else {
-    logo.src = mapLogo;
+  // 120 px is the height of the logo in 300 dpi in portrait mode.
+  const logo = await createImageFromSrc(mapLogo, 120);
+  if (!logo) {
+    throw new Error('Failed to decode logo');
   }
-  await logo.decode();
   return logo;
 }
 
@@ -128,65 +125,50 @@ export function getCopyright(app: VcsUiApp): string | undefined {
   return undefined;
 }
 
-/**
- * @param app The VcsUiApp.
- * @returns The active layers with a legend.
- */
-export function getActiveLegends(app: VcsUiApp): Layer[] {
-  return [...app.layers].filter(
-    (l) =>
-      l.active &&
-      l.isSupported(app.maps.activeMap!) &&
-      (l.properties?.legend ||
-        (l instanceof FeatureLayer && l.style?.properties?.legend)),
-  );
+export function isImageLegendItem(item: LegendItem): item is ImageLegendItem {
+  return item.type === LegendType.Image;
+}
+export function isStyleLegendItem(item: LegendItem): item is StyleLegendItem {
+  return item.type === LegendType.Style;
 }
 
 /**
- * Get all legend items from active and supported layers.
+ * Adds a notification letting the user know that the iframe legend is not supported.
  * @param app The VcsUiApp.
- * @returns An array of object, with the layer title and its legend.
+ * @param title The title of the layer for which to add a notification.
  */
-export function getLegendItems(app: VcsUiApp): LegendItems | undefined {
-  const activeLayersWithLegend = getActiveLegends(app);
-  if (activeLayersWithLegend.length) {
-    return activeLayersWithLegend.map((l) => {
-      const layerTitle = app.vueI18n.t(
-        (l.properties?.title ?? l.name) as string,
-      );
-      const legends = (
-        l instanceof FeatureLayer && l.style?.properties?.legend
-          ? l.style?.properties?.legend
-          : l.properties?.legend
-      ) as LegendEntries;
-      const localizedLegends = legends
-        .filter((legend) => {
-          if (legend.type === LegendType.Iframe) {
-            app.notifier.add({
-              type: NotificationType.INFO,
-              title: layerTitle,
-              message: app.vueI18n.t('print.pdf.iframeNotSupported'),
-            });
-            return false;
-          }
-          return true;
-        })
-        .map((legend) => {
-          let src;
-          if (legend.type === LegendType.Image) {
-            src = app.vueI18n.t((legend as ImageLegendItem).src);
-          }
-          return {
-            ...legend,
-            ...(src && { src }),
-          };
-        });
+function notifyIframeNotSupported(app: VcsUiApp, title: string): false {
+  app.notifier.add({
+    type: NotificationType.INFO,
+    title: app.vueI18n.t(title),
+    message: app.vueI18n.t('print.pdf.iframeNotSupported'),
+  });
+  return false;
+}
 
-      return {
-        title: layerTitle,
-        legends: localizedLegends as LegendEntries,
-      };
-    });
-  }
-  return undefined;
+/**
+ * Parses the passed legend entries to return the printable legend items.
+ * @param app The VcsUiApp.
+ * @param entries The LegendEntries.
+ * @returns An array of object, with the layer title and its legend items.
+ */
+export function parseLegend(
+  app: VcsUiApp,
+  entries: LegendEntry[],
+): PrintableLegendItems {
+  return entries
+    .map(({ title, legend }) => ({
+      title: app.vueI18n.t(title),
+      legends: legend
+        .filter(
+          (l) =>
+            isImageLegendItem(l) ||
+            isStyleLegendItem(l) ||
+            notifyIframeNotSupported(app, title),
+        )
+        .map((l) =>
+          isImageLegendItem(l) ? { ...l, src: app.vueI18n.t(l.src) } : l,
+        ),
+    }))
+    .filter((item) => !!item.legends.length);
 }

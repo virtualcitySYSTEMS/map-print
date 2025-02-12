@@ -11,11 +11,14 @@ import { renderScreenshot } from '@vcmap/core';
 export default async function createAndHandleBlob(
   app: VcsUiApp,
   width: number,
-  createBlob: (canvas: HTMLCanvasElement) => Promise<Blob | null>,
+  createBlob: (
+    canvas: HTMLCanvasElement,
+    translate: (s: string) => string,
+  ) => Promise<Blob | null>,
   fileName: string,
 ): Promise<void> {
   const canvas = await renderScreenshot(app, width);
-  const blob = await createBlob(canvas);
+  const blob = await createBlob(canvas, (s) => app.vueI18n.t(s));
   const url = URL.createObjectURL(blob!);
 
   downloadURI(url, fileName);

@@ -53,14 +53,14 @@
     "jspdf": "^2.5.2"
   },
   "peerDependencies": {
-    "@vcmap/core": "git+ssh://git@gitlab.virtualcitysystems.de/vcsuite/npm/vcmap/core.git#main",
-    "@vcmap/ui": "git+ssh://git@gitlab.virtualcitysystems.de/vcsuite/npm/vcmap/ui.git#main",
+    "@vcmap/core": "^6.1.0-rc.5",
+    "@vcmap/ui": "^6.1.0-rc.5",
     "vue": "~3.4.38",
     "vuetify": "^3.7.3"
   },
   "overrides": {
-    "@vcmap/core": "git+ssh://git@gitlab.virtualcitysystems.de/vcsuite/npm/vcmap/core.git#main",
-    "@vcmap/ui": "git+ssh://git@gitlab.virtualcitysystems.de/vcsuite/npm/vcmap/ui.git#main"
+    "@vcmap/core": "^6.1.0-rc.5",
+    "@vcmap/ui": "^6.1.0-rc.5"
   },
   "devDependencies": {
     "@vcmap/plugin-cli": "^4.0.1",
