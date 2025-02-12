@@ -92,6 +92,8 @@ export type PrintConfig = {
   contactDetails?: ContactInfo;
   /** Whether copyright should be printed on pdf or not. */
   printCopyright?: boolean;
+  /** Whether FeatureInfo windows should be printed on pdf or not. */
+  printFeatureInfo?: boolean;
   /** Whether legend should be printed on pdf or not. */
   printLegend?: boolean;
   /** The page orienation for the legend entries. */
@@ -204,6 +206,12 @@ export function getConfigAndState(
     defaultOptions.printCopyright,
   );
 
+  /** Whether FeatureInfo windows should be printed on pdf or not. */
+  const printFeatureInfo: boolean = parseBoolean(
+    config.printCopyright,
+    defaultOptions.printCopyright,
+  );
+
   /**
    * Whether legend should be printed on pdf or not.
    */
@@ -211,6 +219,7 @@ export function getConfigAndState(
     config.printLegend,
     defaultOptions.printLegend,
   );
+
   /**
    * @example "sameAsMap"
    */
@@ -219,6 +228,7 @@ export function getConfigAndState(
     LegendOrientationOptions,
     defaultOptions.legendOrientation,
   );
+
   /**
    * @example "sameAsMap"
    */
@@ -267,6 +277,7 @@ export function getConfigAndState(
       allowDescription,
       printLogo,
       printCopyright,
+      printFeatureInfo,
       printLegend,
       legendOrientation,
       legendFormat,
@@ -310,6 +321,7 @@ export function validate(options: PrintConfig): void {
     check(options.allowDescription, maybe(Boolean));
     check(options.printLogo, maybe(Boolean));
     check(options.printCopyright, maybe(Boolean));
+    check(options.printFeatureInfo, maybe(Boolean));
     check(options.printLegend, maybe(Boolean));
     check(
       options.legendFormat,

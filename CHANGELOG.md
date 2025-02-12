@@ -2,8 +2,10 @@
 
 - Convert Print plugin to TypeScript
 - Move render Screenshot functionality to @vcmap/core.
+- Adds FeatureInfo Window printing option.
 - Adds Legend printing option.
 - Fixes a bug where a same Copyright entry could be printed multiple times.
+- Improves clarity of the ConfigEditor labels
 
 # v2.0.2
 

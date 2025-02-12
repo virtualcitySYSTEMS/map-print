@@ -315,6 +315,7 @@
         'printLogo',
         'printMapInfo',
         'printCopyright',
+        'printFeatureInfo',
         'printLegend',
       ]);
 

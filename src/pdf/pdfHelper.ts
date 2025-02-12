@@ -11,9 +11,15 @@ import {
   VcsUiApp,
 } from '@vcmap/ui';
 import { getLogger } from '@vcsuite/logger';
+import html2canvas from 'html2canvas';
 import { createImageFromSrc } from '../common/util.js';
 import { ContactInfo } from '../common/configManager.js';
-import { PrintableLegendItems, TextWithHeader } from './pdfCreator.js';
+import {
+  CanvasAndPlacement,
+  PrintableLegendItems,
+  Size,
+  TextWithHeader,
+} from './pdfCreator.js';
 import { name } from '../../package.json';
 
 /**
@@ -34,17 +40,14 @@ export function formatContactInfo(
         const value = contactInfo[key as keyof ContactInfo]!;
         switch (key) {
           case 'mail':
-            return `${app.vueI18n.t(
-              'print.pdf.content.contact.mail',
-            )}: ${value}`;
+            return `${app.vueI18n.t('print.pdf.content.contact.mail')}: ${value}`;
+            return `${app.vueI18n.t('print.pdf.content.contact.mail')}: ${value}`;
           case 'phone':
-            return `${app.vueI18n.t(
-              'print.pdf.content.contact.phone',
-            )}: ${value}`;
+            return `${app.vueI18n.t('print.pdf.content.contact.phone')}: ${value}`;
+            return `${app.vueI18n.t('print.pdf.content.contact.phone')}: ${value}`;
           case 'fax':
-            return `${app.vueI18n.t(
-              'print.pdf.content.contact.fax',
-            )}: ${value}`;
+            return `${app.vueI18n.t('print.pdf.content.contact.fax')}: ${value}`;
+            return `${app.vueI18n.t('print.pdf.content.contact.fax')}: ${value}`;
           default:
             return value;
         }
@@ -122,6 +125,71 @@ export function getCopyright(app: VcsUiApp): string | undefined {
     }
     return filtered;
   }
+  return undefined;
+}
+/**
+ * Creates a canvas and its placement (as a ration of the mapSize) for the given `windowId`.
+ * @param windowId The `id` of the window to return as a canvas.
+ * @param mapSize The Size of the map to be rendered.
+ * @param resolution The user-selected resolution.
+ * @returns An object, containing the canvas and its placement.
+ *  /!\ The returned coords and size are a ratio based on the mapSize.
+ */
+export async function getWindowsCanvas(
+  windowId: string,
+  mapSize: Size,
+  resolution: number,
+): Promise<CanvasAndPlacement | undefined> {
+  const elementId = `window-component--${windowId}`;
+  const infoElement = document.getElementById(elementId);
+  if (infoElement) {
+    const {
+      // Height with the bottom arrow of a balloon
+      scrollHeight: hTot,
+      // Height without the arrow
+      offsetHeight: h,
+      scrollWidth: w,
+      style,
+    } = infoElement;
+    const { right: r, bottom: b, left: l, top: t } = style;
+
+    const size = { width: w / mapSize.width, height: hTot / mapSize.height };
+    const left = +l.slice(0, -2);
+    const bottom = +b.slice(0, -2);
+    const right = +r.slice(0, -2);
+    const top = +t.slice(0, -2);
+
+    let coords;
+    if (Number.isFinite(left) && Number.isFinite(top)) {
+      coords = {
+        x: left / mapSize.width,
+        y: top / mapSize.height,
+      };
+    } else if (Number.isFinite(left) && Number.isFinite(bottom)) {
+      coords = {
+        x: left / mapSize.width,
+        y: (mapSize.height - (bottom + h)) / mapSize.height,
+      };
+    } else if (Number.isFinite(right) && Number.isFinite(top)) {
+      coords = {
+        x: (mapSize.width - (w + right)) / mapSize.width,
+        y: top / mapSize.height,
+      };
+    } else {
+      return undefined;
+    }
+    const canvas = await html2canvas(infoElement, {
+      logging: false,
+      scale: resolution / 96,
+      height: hTot,
+      width: w,
+      backgroundColor: null,
+    });
+    return { canvas, placement: { size, coords } };
+  }
+  getLogger(name).warning(
+    `An error occured while getting window with id "${windowId}"`,
+  );
   return undefined;
 }
 

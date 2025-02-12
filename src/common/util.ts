@@ -92,11 +92,11 @@ export async function createImageFromSrc(
 }
 
 /**
- * Calculates aspect ratio.
+ * Calculates map size.
  * @param map A VcsMap instance
- * @returns The aspect ratio (width/height) of the map
+ * @returns The map size (width, height) of the map
  */
-export function getMapAspectRatio(map: VcsMap): number {
+export function getMapSize(map: VcsMap): Size {
   let width;
   let height;
   if (map instanceof CesiumMap) {
@@ -113,5 +113,5 @@ export function getMapAspectRatio(map: VcsMap): number {
   } else {
     throw new Error('map not supported');
   }
-  return width / height;
+  return { width, height };
 }

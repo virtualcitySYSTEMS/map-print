@@ -29,6 +29,11 @@ export type ElementPlacement = {
   size: Size;
 };
 
+export type CanvasAndPlacement = {
+  canvas: HTMLCanvasElement;
+  placement: ElementPlacement;
+};
+
 export type TextWithHeader = {
   header: string;
   text: Array<string>;
@@ -622,6 +627,15 @@ export default class PDFCreator {
       );
     }
 
+    this.pdfDoc.addImage(
+      canvas,
+      'JPEG',
+      this.imgPlacement!.coords.x,
+      this.imgPlacement!.coords.y,
+      this.imgPlacement!.size.width,
+      this.imgPlacement!.size.height,
+    );
+
     if (this.title) {
       this._setTextStyle('title');
       this.pdfDoc.text(
@@ -631,15 +645,6 @@ export default class PDFCreator {
         { baseline: 'top' },
       );
     }
-
-    this.pdfDoc.addImage(
-      canvas,
-      'JPEG',
-      this.imgPlacement!.coords.x,
-      this.imgPlacement!.coords.y,
-      this.imgPlacement!.size.width,
-      this.imgPlacement!.size.height,
-    );
 
     if (this.copyright) {
       this._setTextStyle('info');

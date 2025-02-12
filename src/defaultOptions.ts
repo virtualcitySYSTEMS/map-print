@@ -20,6 +20,7 @@ export default (): Required<PrintConfig> => {
     resolutionDefault: 1280,
     contactDetails: {},
     printCopyright: true,
+    printFeatureInfo: true,
     printLegend: true,
     legendOrientation: LegendOrientationOptions.SAME_AS_MAP,
     legendFormat: 'sameAsMap',

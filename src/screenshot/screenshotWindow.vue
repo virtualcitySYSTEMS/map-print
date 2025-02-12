@@ -55,7 +55,7 @@
   } from 'vuetify/components';
   import { PrintPlugin } from '../index.js';
   import createAndHandleBlob from './shootScreenAndHandle.js';
-  import { getMapAspectRatio } from '../common/util.js';
+  import { getMapSize } from '../common/util.js';
   import { name } from '../../package.json';
 
   export const screenshotWindowId = 'create_screenshot_window_id';
@@ -86,7 +86,8 @@
        */
       function calcAspectRatio(): void {
         const map = app.maps.activeMap;
-        mapAspectRatio.value = getMapAspectRatio(map!);
+        const mapSize = getMapSize(map!);
+        mapAspectRatio.value = mapSize.width / mapSize.height;
       }
 
       // calc initial aspect ratio

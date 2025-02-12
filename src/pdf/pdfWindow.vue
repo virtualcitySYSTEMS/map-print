@@ -83,6 +83,14 @@
           v-model="printLegend"
         />
       </v-row>
+      <v-row no-gutters v-if="enableFeatureInfoPrinting">
+        <VcsCheckbox
+          :true-value="true"
+          :false-value="false"
+          label="print.pdf.printFeatureInfo"
+          v-model="printFeatureInfo"
+        />
+      </v-row>
     </v-container>
     <v-divider />
     <div class="d-flex w-full justify-end px-2 pt-2 pb-1">
@@ -120,7 +128,7 @@
   } from 'vuetify/components';
   import { getLogger } from '@vcsuite/logger';
   import { PrintPlugin } from '../index.js';
-  import PDFCreator from './pdfCreator.js';
+  import PDFCreator, { CanvasAndPlacement } from './pdfCreator.js';
   import createAndHandleBlob from '../screenshot/shootScreenAndHandle.js';
   import {
     getLogo,
@@ -128,12 +136,13 @@
     getMapInfo,
     getCopyright,
     parseLegend,
+    getWindowsCanvas,
   } from './pdfHelper.js';
   import {
     LegendOrientationOptions,
     OrientationOptions,
   } from '../common/configManager.js';
-  import { getMapAspectRatio } from '../common/util.js';
+  import { getMapSize } from '../common/util.js';
   import { name } from '../../package.json';
 
   export const pdfWindowId = 'create_pdf_window_id';
@@ -166,12 +175,23 @@
       );
       const printLegend = ref(true);
 
+      const enableFeatureInfoPrinting = ref(
+        config.printFeatureInfo && !!app.featureInfo.selectedFeature,
+      );
+      const featureInfoListener =
+        app.featureInfo.featureChanged.addEventListener(() => {
+          enableFeatureInfoPrinting.value = !!app.featureInfo.selectedFeature;
+        });
+      const printFeatureInfo = ref(true);
+
       // State whether calculation is running.
       const running = ref(false);
 
       /** Creates pdf by utilizing the PDFCreator. Handling is done by default function in shootScreenAndHandle.js */
       async function createPdf(): Promise<void> {
         running.value = true;
+        const mapSize = getMapSize(app.maps.activeMap!);
+
         let logo;
         if (config.printLogo) {
           try {
@@ -218,10 +238,12 @@
               !config.legendFormat || config.legendFormat === 'sameAsMap'
                 ? state.selectedFormat
                 : config.legendFormat;
-            let orientation: LegendOrientationOptions;
+            let orientation:
+              | LegendOrientationOptions.LANDSCAPE
+              | LegendOrientationOptions.PORTRAIT;
             if (
               config.legendOrientation &&
-              config.legendOrientation !== 'sameAsMap'
+              config.legendOrientation !== LegendOrientationOptions.SAME_AS_MAP
             ) {
               orientation = config.legendOrientation;
             } else if (
@@ -233,6 +255,20 @@
             }
             const legendConfig = { format, orientation };
             legend = { items, config: legendConfig };
+          }
+        }
+
+        /** The windows to be overprinted on the map. */
+        const overlayWindows: CanvasAndPlacement[] = [];
+
+        if (enableFeatureInfoPrinting.value && printFeatureInfo.value) {
+          const featureInfo = await getWindowsCanvas(
+            app.featureInfo.windowId!,
+            mapSize,
+            state.selectedPpi,
+          );
+          if (featureInfo) {
+            overlayWindows.push(featureInfo);
           }
         }
 
@@ -251,7 +287,7 @@
           )!,
         };
 
-        const mapAspectRatio = getMapAspectRatio(app.maps.activeMap!);
+        const mapAspectRatio = mapSize.width / mapSize.height;
 
         const pdfCreator = new PDFCreator();
         await pdfCreator
@@ -272,11 +308,13 @@
             // after setup possible to execute pdfCreator.create()
             const width =
               pdfCreator.imgPlacement!.size.width * state.selectedPpi;
+
             await createAndHandleBlob(
               app,
               width,
               pdfCreator.create.bind(pdfCreator),
               'map.pdf',
+              overlayWindows,
             );
           })
           .catch((e) => {
@@ -290,12 +328,17 @@
           });
       }
 
-      onUnmounted(destroy);
+      onUnmounted(() => {
+        destroy();
+        featureInfoListener();
+      });
 
       return {
         state,
         config,
         enableLegendPrinting,
+        enableFeatureInfoPrinting,
+        printFeatureInfo,
         printLegend,
         running,
         createPdf,
