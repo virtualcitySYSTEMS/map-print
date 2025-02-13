@@ -208,8 +208,8 @@ export function getConfigAndState(
 
   /** Whether FeatureInfo windows should be printed on pdf or not. */
   const printFeatureInfo: boolean = parseBoolean(
-    config.printCopyright,
-    defaultOptions.printCopyright,
+    config.printFeatureInfo,
+    defaultOptions.printFeatureInfo,
   );
 
   /**
