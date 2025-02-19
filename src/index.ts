@@ -80,6 +80,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
         { id: pdfWindowId, action: pdfAction },
         name,
         ButtonLocation.SHARE,
+        { mobile: true, desktop: true, tablet: true },
       );
       const { action: screenshotAction, destroy: screenshotDestroy } =
         createToggleAction(
@@ -108,6 +109,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
         { id: screenshotWindowId, action: screenshotAction },
         name,
         ButtonLocation.SHARE,
+        { mobile: true, desktop: true, tablet: true },
       );
       destroy = (): void => {
         pdfDestroy();
