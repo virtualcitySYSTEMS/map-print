@@ -1,6 +1,6 @@
 {
   "name": "@vcmap/print",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "VC Map Plugin for taking screenshots and creating PDFs of the current view of the map.",
   "type": "module",
   "main": "dist/index.js",
