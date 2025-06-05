@@ -1,3 +1,7 @@
+# v3.0.1
+
+- Updated jsPDF Dependency to version 3.x
+
 # v3.0.0
 
 - Updates @vcmap/core and @vcmap/ui to version 6.1
