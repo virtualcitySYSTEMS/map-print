@@ -26,14 +26,12 @@
     </v-container>
     <v-divider />
     <div class="d-flex w-full justify-end px-2 pt-2 pb-1">
-      <VcsFormButton @click="createJPG()" variant="filled">
+      <VcsFormButton variant="filled" @click="createJPG()">
         {{ $t('print.image.createButton') }}
       </VcsFormButton>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped></style>
 
 <script lang="ts">
   import {
@@ -44,7 +42,8 @@
     onUnmounted,
     ref,
   } from 'vue';
-  import { VcsSelect, VcsLabel, VcsFormButton, VcsUiApp } from '@vcmap/ui';
+  import type { VcsUiApp } from '@vcmap/ui';
+  import { VcsSelect, VcsLabel, VcsFormButton } from '@vcmap/ui';
   import {
     VOverlay,
     VIcon,
@@ -53,7 +52,7 @@
     VCol,
     VDivider,
   } from 'vuetify/components';
-  import { PrintPlugin } from '../index.js';
+  import type { PrintPlugin } from '../index.js';
   import createAndHandleBlob from './shootScreenAndHandle.js';
   import { getMapSize } from '../common/util.js';
   import { name } from '../../package.json';
@@ -104,11 +103,13 @@
 
       // Event listener for window resize events.
       // When resized then calculate the aspect ratio of map.
-      onMounted(() => window.addEventListener('resize', handleResizeEvent));
+      onMounted(() => {
+        window.addEventListener('resize', handleResizeEvent);
+      });
 
-      onUnmounted(() =>
-        window.removeEventListener('resize', handleResizeEvent),
-      );
+      onUnmounted(() => {
+        window.removeEventListener('resize', handleResizeEvent);
+      });
 
       // calculate the possible width and heights for creating the screenshot.
       // is calculated from the config resolutionList.
@@ -162,3 +163,5 @@
     },
   });
 </script>
+
+<style lang="scss" scoped></style>

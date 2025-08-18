@@ -1,14 +1,12 @@
-import {
-  CesiumMap,
-  ObliqueMap,
-  OpenlayersMap,
-  PanoramaMap,
-  VcsMap,
-} from '@vcmap/core';
+import type { VcsMap } from '@vcmap/core';
+import { CesiumMap, ObliqueMap, OpenlayersMap, PanoramaMap } from '@vcmap/core';
 import { getLogger } from '@vcsuite/logger';
 import DOMPurify from 'dompurify';
-import { Size } from '../pdf/pdfCreator.js';
+import type { Size } from '../pdf/pdfCreator.js';
 import { name } from '../../package.json';
+
+/** PPI of JSPDF for calculaing e.g. fontsize */
+export const JSPDF_PPI = 72;
 
 /**
  * @param input The SVG path.

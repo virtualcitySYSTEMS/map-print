@@ -1,7 +1,9 @@
-import { LegendItem } from '@vcmap/ui';
+import type { LegendItem } from '@vcmap/ui';
 import { jsPDF } from 'jspdf';
+import { JSPDF_PPI } from '../common/util.js';
 import pageSizes from './standardPageSizes.js';
-import { pageStyles, FontWeights, PageStyle } from './styles.js';
+import type { PageStyle } from './styles.js';
+import { pageStyles, fontWeights } from './styles.js';
 import {
   contactKeysPattern,
   LegendOrientationOptions,
@@ -82,9 +84,6 @@ type PDFCreatorOptions = {
 const defaultOptions = getDefaultOptions();
 
 export default class PDFCreator {
-  /** PPI of JSPDF for calculaing e.g. fontsize */
-  static JSPDF_PPI = 72;
-
   initialized = false;
 
   // eslint-disable-next-line new-cap
@@ -190,7 +189,7 @@ export default class PDFCreator {
       pdfCreatorOptions.format !== defaultOptions.formatDefault ||
       pdfCreatorOptions.orientation !== defaultOptions.orientationDefault
     ) {
-      const format = pdfCreatorOptions.format as keyof typeof pageSizes;
+      const { format } = pdfCreatorOptions;
       this.pdfSize =
         pdfCreatorOptions.orientation === OrientationOptions.PORTRAIT
           ? { width: pageSizes[format][0], height: pageSizes[format][1] }
@@ -312,7 +311,7 @@ export default class PDFCreator {
         'normal',
         this.formatting[
           `${textElement}.fontWeight` as keyof Omit<PageStyle, 'pageMargins'>
-        ] || FontWeights.REGULAR,
+        ] || fontWeights.REGULAR,
       )
       .setFontSize(
         this.formatting[
@@ -332,7 +331,7 @@ export default class PDFCreator {
    * @returns The total height in inches
    */
   private _calcTotalLineHeight(numberLines: number): number {
-    return (this.pdfDoc.getLineHeight() / PDFCreator.JSPDF_PPI) * numberLines;
+    return (this.pdfDoc.getLineHeight() / JSPDF_PPI) * numberLines;
   }
 
   // TODO: works only if two elements are beside each other
@@ -687,7 +686,7 @@ export default class PDFCreator {
         this.contactPlacement!.coords.y + this._calcTotalLineHeight(1),
         { baseline: 'hanging' },
       );
-      this.pdfDoc.setFont(this.font, 'normal', FontWeights.BOLD);
+      this.pdfDoc.setFont(this.font, 'normal', fontWeights.BOLD);
       this.pdfDoc.text(
         this.contact.header,
         this.contactPlacement!.coords.x,
@@ -705,7 +704,7 @@ export default class PDFCreator {
         this.mapInfoPlacement!.coords.y + this._calcTotalLineHeight(1),
         { baseline: 'hanging' },
       );
-      this.pdfDoc.setFont(this.font, 'normal', FontWeights.BOLD);
+      this.pdfDoc.setFont(this.font, 'normal', fontWeights.BOLD);
       this.pdfDoc.text(
         this.mapInfo.header,
         this.mapInfoPlacement!.coords.x,
@@ -743,6 +742,7 @@ export default class PDFCreator {
         : { width: pageSizes[format][0], height: pageSizes[format][1] };
 
       const items = this.legend.items.filter((i) => !!i.legends.length);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       for await (const legendEntry of items) {
         this.currentLayerTitle = legendEntry.title;
         const titleHeight = this._addLegendPage();
@@ -797,7 +797,9 @@ export default class PDFCreator {
       const font = await fetch(fontPath).then((response) => response.blob());
       const base64url: string = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.onload = (): void => resolve(reader.result as string);
+        reader.onload = (): void => {
+          resolve(reader.result as string);
+        };
         reader.readAsDataURL(font);
       });
 
@@ -808,8 +810,8 @@ export default class PDFCreator {
       pdfDoc.addFont(`${name}-${fontWeight}.ttf`, name, 'normal', fontWeight);
     }
 
-    await addFont(fonts.name, fonts.regular, FontWeights.REGULAR, this.pdfDoc);
-    await addFont(fonts.name, fonts.bold, FontWeights.BOLD, this.pdfDoc);
+    await addFont(fonts.name, fonts.regular, fontWeights.REGULAR, this.pdfDoc);
+    await addFont(fonts.name, fonts.bold, fontWeights.BOLD, this.pdfDoc);
 
     // Only one custom font is allowed so the name of the first is returned and therefore used.
     return fonts.name;

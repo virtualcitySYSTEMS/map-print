@@ -1,22 +1,12 @@
-import {
-  ButtonLocation,
-  createToggleAction,
-  PluginConfigEditor,
-  VcsPlugin,
-  VcsUiApp,
-  WindowSlot,
-} from '@vcmap/ui';
+import type { PluginConfigEditor, VcsPlugin, VcsUiApp } from '@vcmap/ui';
+import { ButtonLocation, createToggleAction, WindowSlot } from '@vcmap/ui';
 import deepEqual from 'fast-deep-equal';
 import PdfWindow, { pdfWindowId } from './pdf/pdfWindow.vue';
 import ScreenshotWindow, {
   screenshotWindowId,
 } from './screenshot/screenshotWindow.vue';
-import {
-  getConfigAndState,
-  validate,
-  PrintConfig,
-  PrintState,
-} from './common/configManager.js';
+import type { PrintConfig, PrintState } from './common/configManager.js';
+import { getConfigAndState, validate } from './common/configManager.js';
 import getDefaultOptions from './defaultOptions.js';
 import PrintConfigEditor from './PrintConfigEditor.vue';
 import { name, version, mapVersion } from '../package.json';

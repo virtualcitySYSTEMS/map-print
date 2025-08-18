@@ -1,5 +1,6 @@
 import { parseBoolean, parseEnumValue } from '@vcsuite/parsers';
-import { check, maybe, ofEnum, oneOf, Pattern, strict } from '@vcsuite/check';
+import type { Pattern } from '@vcsuite/check';
+import { check, maybe, ofEnum, oneOf, strict } from '@vcsuite/check';
 import { reactive } from 'vue';
 import { getLogger } from '@vcsuite/logger';
 import standardPageSizes from '../pdf/standardPageSizes.js';

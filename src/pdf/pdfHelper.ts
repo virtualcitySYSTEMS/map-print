@@ -1,21 +1,23 @@
 import { PanoramaMap } from '@vcmap/core';
-import {
-  getAttributions,
+import type {
   ImageLegendItem,
   LegendEntry,
   LegendItem,
+  StyleLegendItem,
+  VcsUiApp,
+} from '@vcmap/ui';
+import {
+  getAttributions,
   LegendType,
   NotificationType,
-  StyleLegendItem,
   // @ts-expect-error {no exported member VcsDefaultLogo because of bug in UI. Issue 664}
   VcsDefaultLogo,
-  VcsUiApp,
 } from '@vcmap/ui';
 import { getLogger } from '@vcsuite/logger';
 import html2canvas from 'html2canvas';
 import { createImageFromSrc } from '../common/util.js';
-import { ContactInfo } from '../common/configManager.js';
-import {
+import type { ContactInfo } from '../common/configManager.js';
+import type {
   CanvasAndPlacement,
   PrintableLegendItems,
   Size,

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /** The font weight used by the pdfCreator */
-export const FontWeights = {
+export const fontWeights = {
   BOLD: 700,
   REGULAR: 400,
 };
@@ -32,7 +33,7 @@ export const pageStyles: { default: PageStyle; A5: Partial<PageStyle> } = {
     elementMargin: 0.4,
     // factor for scaling logo compared to lineheight of title
     'logo.scale': 1.2,
-    'title.fontWeight': FontWeights.BOLD,
+    'title.fontWeight': fontWeights.BOLD,
     'title.fontSize': 20,
     // the portion of total printable line width (excluding page margins)
     'title.widthPortion.portrait': 0.5,
@@ -40,13 +41,13 @@ export const pageStyles: { default: PageStyle; A5: Partial<PageStyle> } = {
     // max line count, other lines are not printed
     'title.maxLineCount.portrait': 2,
     'title.maxLineCount.landscape': 1,
-    'description.fontWeight': FontWeights.REGULAR,
+    'description.fontWeight': fontWeights.REGULAR,
     'description.fontSize': 11,
     'description.lineHeight': 1.25,
     'description.maxLineCount.portrait': 15,
     'description.maxLineCount.landscape': 8,
     // contact and image information
-    'info.fontWeight': FontWeights.REGULAR,
+    'info.fontWeight': fontWeights.REGULAR,
     'info.fontSize': 10,
     'info.widthPortion.portrait': 0.5,
     'info.widthPortion.landscape': 0.25,

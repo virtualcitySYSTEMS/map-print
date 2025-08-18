@@ -1,4 +1,4 @@
-import {
+import type {
   LegendOrientationOptions,
   OrientationOptions,
   PrintConfig,
@@ -10,8 +10,8 @@ export default (): Required<PrintConfig> => {
     formatDefault: 'A4',
     ppiList: [150, 300, 450],
     ppiDefault: 300,
-    orientationOptions: OrientationOptions.BOTH,
-    orientationDefault: OrientationOptions.PORTRAIT,
+    orientationOptions: 'both' as OrientationOptions,
+    orientationDefault: 'portrait' as OrientationOptions.PORTRAIT,
     allowTitle: true,
     allowDescription: true,
     printLogo: true,
@@ -22,7 +22,7 @@ export default (): Required<PrintConfig> => {
     printCopyright: true,
     printFeatureInfo: true,
     printLegend: true,
-    legendOrientation: LegendOrientationOptions.SAME_AS_MAP,
+    legendOrientation: 'sameAsMap' as LegendOrientationOptions,
     legendFormat: 'sameAsMap',
   };
 };

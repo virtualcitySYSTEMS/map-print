@@ -18,8 +18,8 @@
         <v-col>
           <VcsSelect
             id="sizeSelect"
-            :items="config.formatList"
             v-model="state.selectedFormat"
+            :items="config.formatList"
           />
         </v-col>
       </v-row>
@@ -58,53 +58,52 @@
       <v-row no-gutters>
         <v-col>
           <VcsTextField
-            :placeholder="$t('print.pdf.titlePlaceholder')"
-            v-model="state.title"
             v-if="config.allowTitle"
+            v-model="state.title"
+            :placeholder="$t('print.pdf.titlePlaceholder')"
           />
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col>
           <VcsTextArea
+            v-if="config.allowDescription"
+            v-model="state.description"
             :placeholder="$t('print.pdf.descriptionPlaceholder')"
             class="py-1"
             rows="2"
-            v-model="state.description"
-            v-if="config.allowDescription"
           />
         </v-col>
       </v-row>
-      <v-row no-gutters v-if="enableLegendPrinting">
+      <v-row v-if="enableLegendPrinting" no-gutters>
         <VcsCheckbox
+          v-model="printLegend"
           :true-value="true"
           :false-value="false"
           label="print.pdf.printLegend"
-          v-model="printLegend"
         />
       </v-row>
-      <v-row no-gutters v-if="enableFeatureInfoPrinting">
+      <v-row v-if="enableFeatureInfoPrinting" no-gutters>
         <VcsCheckbox
+          v-model="printFeatureInfo"
           :true-value="true"
           :false-value="false"
           label="print.pdf.printFeatureInfo"
-          v-model="printFeatureInfo"
         />
       </v-row>
     </v-container>
     <v-divider />
     <div class="d-flex w-full justify-end px-2 pt-2 pb-1">
-      <VcsFormButton @click="createPdf" variant="filled">
+      <VcsFormButton variant="filled" @click="createPdf">
         {{ $t('print.pdf.createButton') }}
       </VcsFormButton>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped></style>
-
 <script lang="ts">
   import { computed, defineComponent, inject, onUnmounted, ref } from 'vue';
+  import type { VcsUiApp } from '@vcmap/ui';
   import {
     getLegendEntries,
     getPluginAssetUrl,
@@ -116,7 +115,6 @@
     VcsSelect,
     VcsTextArea,
     VcsTextField,
-    VcsUiApp,
   } from '@vcmap/ui';
   import {
     VCol,
@@ -127,8 +125,9 @@
     VRow,
   } from 'vuetify/components';
   import { getLogger } from '@vcsuite/logger';
-  import { PrintPlugin } from '../index.js';
-  import PDFCreator, { CanvasAndPlacement } from './pdfCreator.js';
+  import type { PrintPlugin } from '../index.js';
+  import type { CanvasAndPlacement } from './pdfCreator.js';
+  import PDFCreator from './pdfCreator.js';
   import createAndHandleBlob from '../screenshot/shootScreenAndHandle.js';
   import {
     getLogo,
@@ -317,10 +316,10 @@
               overlayWindows,
             );
           })
-          .catch((e) => {
+          .catch((e: unknown) => {
             app.notifier.add({
               type: NotificationType.ERROR,
-              message: e.message,
+              message: (e as Error).message,
             });
           })
           .finally(() => {
@@ -346,3 +345,5 @@
     },
   });
 </script>
+
+<style lang="scss" scoped></style>

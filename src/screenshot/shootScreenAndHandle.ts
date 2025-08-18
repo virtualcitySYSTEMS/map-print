@@ -1,6 +1,7 @@
-import { downloadURI, VcsUiApp } from '@vcmap/ui';
+import type { VcsUiApp } from '@vcmap/ui';
+import { downloadURI } from '@vcmap/ui';
 import { renderScreenshot } from '@vcmap/core';
-import { CanvasAndPlacement } from '../pdf/pdfCreator.js';
+import type { CanvasAndPlacement } from '../pdf/pdfCreator.js';
 
 /**
  * Adds elements as overlays on the main Map canvas.

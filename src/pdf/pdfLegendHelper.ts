@@ -1,4 +1,4 @@
-import {
+import type {
   CircleLegendRow,
   FillLegendRow,
   IconLegendRow,
@@ -6,14 +6,15 @@ import {
   RegularShapeLegendRow,
   StrokeLegendRow,
   StyleLegendItem,
-  StyleRowType,
 } from '@vcmap/ui';
-import { ColorType, getShapeFromOptions, parseColor } from '@vcmap/core';
+import { StyleRowType } from '@vcmap/ui';
+import type { ColorType } from '@vcmap/core';
+import { getShapeFromOptions, parseColor } from '@vcmap/core';
 import { getLogger } from '@vcsuite/logger';
-import jsPDF from 'jspdf';
-import PDFCreator, { Coords, ElementPlacement, Size } from './pdfCreator.js';
-import { PageStyle } from './styles.js';
-import { createImageFromSrc } from '../common/util.js';
+import type { jsPDF } from 'jspdf';
+import type { Coords, ElementPlacement, Size } from './pdfCreator.js';
+import type { PageStyle } from './styles.js';
+import { createImageFromSrc, JSPDF_PPI } from '../common/util.js';
 import { name } from '../../package.json';
 import { isImageLegendItem, isStyleLegendItem } from './pdfHelper.js';
 
@@ -33,8 +34,8 @@ function sizeAndPrintImage(
   centerY = false,
 ): number {
   const { naturalHeight, naturalWidth } = img;
-  const imgNatHeight = naturalHeight / PDFCreator.JSPDF_PPI;
-  const imgNatWidth = naturalWidth / PDFCreator.JSPDF_PPI;
+  const imgNatHeight = naturalHeight / JSPDF_PPI;
+  const imgNatWidth = naturalWidth / JSPDF_PPI;
   const imageRatio = naturalHeight / naturalWidth;
   const { height: maxH, width: maxW } = placement.size;
   const dimensionsRatio = maxH / maxW;
@@ -111,6 +112,7 @@ async function renderStyleLegend(
 
   let { x, y } = currentPos;
   let idx = -1;
+  // eslint-disable-next-line @typescript-eslint/await-thenable
   for await (const row of styleItem.rows) {
     // Set default line width
     pdfDoc.setLineWidth(0.005);
@@ -135,7 +137,7 @@ async function renderStyleLegend(
         setStrokeColor(pdfDoc, stroke.color);
         style += 'D';
         if (stroke.width) {
-          pdfDoc.setLineWidth(stroke.width / PDFCreator.JSPDF_PPI);
+          pdfDoc.setLineWidth(stroke.width / JSPDF_PPI);
         }
       }
     }
@@ -166,12 +168,12 @@ async function renderStyleLegend(
       );
       const { width } = legend.image.stroke as { width?: number };
       if (width) {
-        pdfDoc.setLineWidth(width / PDFCreator.JSPDF_PPI);
+        pdfDoc.setLineWidth(width / JSPDF_PPI);
       }
       setFillColor(pdfDoc, (legend.image.fill as { color?: number[] })?.color);
       const radius = Math.min(
         itemSize.height / 2,
-        legend.image.radius / PDFCreator.JSPDF_PPI,
+        legend.image.radius / JSPDF_PPI,
       );
       pdfDoc.circle(
         x + itemSize.width / 2,
@@ -185,7 +187,7 @@ async function renderStyleLegend(
         const placement = { coords: { x, y }, size: { ...itemSize } };
         await createImageFromSrc(
           legend.image.src,
-          itemSize.height * PDFCreator.JSPDF_PPI,
+          itemSize.height * JSPDF_PPI,
         ).then((img) => {
           if (img) {
             sizeAndPrintImage(pdfDoc, img, placement, true);
@@ -198,10 +200,7 @@ async function renderStyleLegend(
       const imageRep = shape.getImage(1);
       const src = imageRep.toDataURL();
       const placement = { coords: { x, y }, size: { ...itemSize } };
-      await createImageFromSrc(
-        src,
-        itemSize.height * PDFCreator.JSPDF_PPI,
-      ).then((img) => {
+      await createImageFromSrc(src, itemSize.height * JSPDF_PPI).then((img) => {
         if (img) {
           sizeAndPrintImage(pdfDoc, img, placement, true);
         }
@@ -255,7 +254,7 @@ function drawSeparatingLine(
  * @param translate A callback used to translate the row titles.
  * @param config The configuration of the Legend pages: top-left coords, size and whether to create two columns.
  */
-// eslint-disable-next-line import/prefer-default-export
+
 export async function addLayerLegend(
   pdfDoc: jsPDF,
   formatting: PageStyle,
@@ -316,6 +315,7 @@ export async function addLayerLegend(
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/await-thenable
   for await (const legendItem of legendItems) {
     if (currentSize.height <= 0) {
       nextPage();
@@ -338,7 +338,7 @@ export async function addLayerLegend(
             const { naturalHeight: imgH } = img;
             // Ensures the image will not be smaller than 80% of its naturalHeight, or jump to next page otherwise if more than a third of the height is already filled.
             if (
-              (imgH / PDFCreator.JSPDF_PPI) * 0.8 > currentSize.height &&
+              (imgH / JSPDF_PPI) * 0.8 > currentSize.height &&
               currentPos.y - config.origin.y > dimensions.height / 3
             ) {
               nextPage();

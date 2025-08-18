@@ -1,10 +1,10 @@
 <template>
-  <AbstractConfigEditor @submit="apply" v-bind="{ ...$attrs, ...$props }">
+  <AbstractConfigEditor v-bind="{ ...$attrs, ...$props }" @submit="apply">
     <VcsFormSection
+      v-if="localConfig"
       heading="print.pdf.header"
       expandable
       :start-open="true"
-      v-if="localConfig"
     >
       <v-container class="py-0 px-1">
         <v-row no-gutters>
@@ -16,10 +16,10 @@
           <v-col>
             <VcsSelect
               id="formatList"
+              v-model="localConfig.formatList"
               multiple
               :items="['A5', 'A4', 'A3', 'A2']"
-              v-model="localConfig.formatList"
-              @update:modelValue="
+              @update:model-value="
                 (v: ('A2' | 'A3' | 'A4' | 'A5')[]) =>
                   updateDefault('formatDefault', v)
               "
@@ -35,8 +35,8 @@
           <v-col>
             <VcsSelect
               id="formatDefault"
-              :items="localConfig.formatList"
               v-model="localConfig.formatDefault"
+              :items="localConfig.formatList"
               :rules="[(v: string) => !!v || 'components.validation.required']"
             />
           </v-col>
@@ -50,16 +50,16 @@
           <v-col>
             <VcsChipArrayInput
               id="ppiList"
+              v-model="localConfig.ppiList"
               column
               type="number"
               placeholder="300"
-              v-model="localConfig.ppiList"
-              @update:modelValue="
-                (v: number[]) => updateDefault('ppiDefault', v)
-              "
               :rules="[
                 (v: number) => v > 0 || 'components.validation.notValid',
               ]"
+              @update:model-value="
+                (v: number[]) => updateDefault('ppiDefault', v)
+              "
             />
           </v-col>
         </v-row>
@@ -72,8 +72,8 @@
           <v-col>
             <VcsSelect
               id="ppiDefault"
-              :items="localConfig.ppiList"
               v-model.number="localConfig.ppiDefault"
+              :items="localConfig.ppiList"
               :rules="[(v: number) => !!v || 'components.validation.required']"
             />
           </v-col>
@@ -87,12 +87,12 @@
           <v-col>
             <VcsSelect
               id="orientationOptions"
-              :items="orientationOptionsItems"
               v-model="localConfig.orientationOptions"
+              :items="orientationOptionsItems"
             />
           </v-col>
         </v-row>
-        <v-row no-gutters v-if="localConfig.orientationOptions === 'both'">
+        <v-row v-if="localConfig.orientationOptions === 'both'" no-gutters>
           <v-col>
             <VcsLabel html-for="orientationDefault">
               {{ $t('print.editor.orientationDefault') }}
@@ -101,21 +101,21 @@
           <v-col>
             <VcsSelect
               id="orientationDefault"
+              v-model="localConfig.orientationDefault"
               :items="
                 orientationOptionsItems.filter(({ value }) => value !== 'both')
               "
-              v-model="localConfig.orientationDefault"
             />
           </v-col>
         </v-row>
-        <v-row no-gutters v-for="key in configKeys" :key="key">
+        <v-row v-for="key in configKeys" :key="key" no-gutters>
           <v-col class="pl-1">
             <VcsCheckbox
               :id="key"
+              v-model="localConfig[key]"
               :true-value="true"
               :false-value="false"
               :label="`print.editor.${key}`"
-              v-model="localConfig[key]"
             />
           </v-col>
         </v-row>
@@ -130,8 +130,8 @@
             <v-col>
               <VcsSelect
                 id="legendOrientation"
-                :items="legendOrientationOptions"
                 v-model="localConfig.legendOrientation"
+                :items="legendOrientationOptions"
               />
             </v-col>
           </v-row>
@@ -144,8 +144,8 @@
             <v-col>
               <VcsSelect
                 id="legendFormat"
-                :items="legendFormatOptions"
                 v-model="localConfig.legendFormat"
+                :items="legendFormatOptions"
               />
             </v-col>
           </v-row>
@@ -154,15 +154,15 @@
           <v-col class="pl-1">
             <VcsCheckbox
               id="printContactDetails"
+              v-model="printContactDetails"
               :true-value="true"
               :false-value="false"
               label="print.editor.printContactDetails"
-              v-model="printContactDetails"
             />
           </v-col>
         </v-row>
         <template v-if="printContactDetails">
-          <v-row no-gutters v-for="key in contactKeys" :key="key">
+          <v-row v-for="key in contactKeys" :key="key" no-gutters>
             <v-col class="pl-5">
               <VcsLabel :html-for="key">
                 {{ $st(`print.editor.contactDetails.${key}`) }}
@@ -171,8 +171,8 @@
             <v-col cols="6">
               <VcsTextField
                 :id="key"
-                clearable
                 v-model="localConfig.contactDetails![key]"
+                clearable
               />
             </v-col>
           </v-row>
@@ -180,10 +180,10 @@
       </v-container>
     </VcsFormSection>
     <VcsFormSection
+      v-if="localConfig"
       heading="print.image.header"
       expandable
       :start-open="true"
-      v-if="localConfig"
     >
       <v-container class="py-0 px-1">
         <v-row no-gutters>
@@ -195,16 +195,16 @@
           <v-col>
             <VcsChipArrayInput
               id="resolutionList"
+              v-model="localConfig.resolutionList"
               column
               placeholder="1920"
               type="number"
-              v-model="localConfig.resolutionList"
-              @update:modelValue="
-                (v: number[]) => updateDefault('resolutionDefault', v)
-              "
               :rules="[
                 (v: number) => v > 0 || 'components.validation.notValid',
               ]"
+              @update:model-value="
+                (v: number[]) => updateDefault('resolutionDefault', v)
+              "
             />
           </v-col>
         </v-row>
@@ -217,8 +217,8 @@
           <v-col>
             <VcsSelect
               id="resolutionDefault"
-              :items="localConfig.resolutionList"
               v-model.number="localConfig.resolutionDefault"
+              :items="localConfig.resolutionList"
               :rules="[(v: number) => !!v || 'components.validation.required']"
             />
           </v-col>
@@ -239,13 +239,13 @@
     VcsCheckbox,
     VcsChipArrayInput,
   } from '@vcmap/ui';
-  import { defineComponent, PropType, ref, toRaw } from 'vue';
+  import type { PropType } from 'vue';
+  import { defineComponent, ref, toRaw } from 'vue';
   import getDefaultOptions from './defaultOptions.js';
+  import type { ContactInfo, PrintConfig } from './common/configManager.js';
   import {
-    ContactInfo,
     LegendOrientationOptions,
     OrientationOptions,
-    PrintConfig,
   } from './common/configManager.js';
   import standardPageSizes from './pdf/standardPageSizes.js';
 
