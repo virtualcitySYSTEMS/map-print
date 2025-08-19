@@ -1,3 +1,4 @@
+import { PanoramaMap } from '@vcmap/core';
 import {
   getAttributions,
   ImageLegendItem,
@@ -41,12 +42,9 @@ export function formatContactInfo(
         switch (key) {
           case 'mail':
             return `${app.vueI18n.t('print.pdf.content.contact.mail')}: ${value}`;
-            return `${app.vueI18n.t('print.pdf.content.contact.mail')}: ${value}`;
           case 'phone':
             return `${app.vueI18n.t('print.pdf.content.contact.phone')}: ${value}`;
-            return `${app.vueI18n.t('print.pdf.content.contact.phone')}: ${value}`;
           case 'fax':
-            return `${app.vueI18n.t('print.pdf.content.contact.fax')}: ${value}`;
             return `${app.vueI18n.t('print.pdf.content.contact.fax')}: ${value}`;
           default:
             return value;
@@ -79,16 +77,22 @@ export async function getLogo(app: VcsUiApp): Promise<HTMLImageElement> {
 export async function getMapInfo(
   app: VcsUiApp,
 ): Promise<TextWithHeader | undefined> {
-  const coordinatesTitle = app.vueI18n.t('print.pdf.content.centerCoordinate');
+  const header = app.vueI18n.t('print.pdf.content.mapInfo');
   const viewpoint = await app.maps.activeMap?.getViewpoint();
   const groundPosition = viewpoint?.groundPosition;
+  const cameraPosition = viewpoint?.cameraPosition;
+
   if (groundPosition) {
-    const coordinates = `${coordinatesTitle}: ${groundPosition[0].toFixed(4)}, ${groundPosition[1].toFixed(4)}`;
-    return {
-      header: app.vueI18n.t('print.pdf.content.mapInfo'),
-      // text can be extended by other informations like layers
-      text: [coordinates],
-    };
+    const coordinates = `${app.vueI18n.t(
+      'print.pdf.content.centerCoordinate',
+    )}: ${groundPosition[0].toFixed(4)}, ${groundPosition[1].toFixed(4)}`;
+    // text can be extended by other informations like layers
+    return { header, text: [coordinates] };
+  } else if (cameraPosition && app.maps.activeMap instanceof PanoramaMap) {
+    const coordinates = `${app.vueI18n.t(
+      'print.pdf.content.cameraCoordinate',
+    )}: ${cameraPosition[0].toFixed(4)}, ${cameraPosition[1].toFixed(4)}`;
+    return { header, text: [coordinates] };
   } else {
     getLogger(name).error('Map center cannot be determined');
     return undefined;

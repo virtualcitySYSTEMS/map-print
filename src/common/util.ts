@@ -1,4 +1,10 @@
-import { CesiumMap, ObliqueMap, OpenlayersMap, VcsMap } from '@vcmap/core';
+import {
+  CesiumMap,
+  ObliqueMap,
+  OpenlayersMap,
+  PanoramaMap,
+  VcsMap,
+} from '@vcmap/core';
 import { getLogger } from '@vcsuite/logger';
 import DOMPurify from 'dompurify';
 import { Size } from '../pdf/pdfCreator.js';
@@ -99,7 +105,7 @@ export async function createImageFromSrc(
 export function getMapSize(map: VcsMap): Size {
   let width;
   let height;
-  if (map instanceof CesiumMap) {
+  if (map instanceof CesiumMap || map instanceof PanoramaMap) {
     ({ width, height } = map.getCesiumWidget()!.scene.canvas);
   } else if (map instanceof OpenlayersMap || map instanceof ObliqueMap) {
     const canvas = Array.from(

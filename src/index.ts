@@ -165,6 +165,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
               },
               mapInfo: 'Karteninformation',
               centerCoordinate: 'Mittelpunkt (WGS84)',
+              cameraCoordinate: 'Aufnahmepunkt (WGS84)',
             },
             iframeNotSupported:
               'Aufgrund technischer Beschränkungen können Legendenelemente des Typs Iframe nicht gedruckt werden.',
@@ -238,6 +239,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
               },
               mapInfo: 'Map information',
               centerCoordinate: 'Center (WGS84)',
+              cameraCoordinate: 'Capture point (WGS84)',
             },
             iframeNotSupported:
               'Due to technical limitations, legend items of type Iframe cannot be printed.',
