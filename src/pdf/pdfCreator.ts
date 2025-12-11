@@ -73,6 +73,8 @@ type PDFCreatorOptions = {
   contact?: TextWithHeader;
   /** Information about the map content. */
   mapInfo?: TextWithHeader;
+  /** Information about the map content. */
+  obliqueLink?: string;
   /** Information about the copyright. */
   copyright?: string;
   /** Information about the legend. */
@@ -147,6 +149,9 @@ export default class PDFCreator {
 
   /** Position and dimensions of the map information. */
   mapInfoPlacement?: ElementPlacement;
+
+  /** Oblique link. */
+  obliqueLink?: string;
 
   /**
    * The description string of the pdf splitted according to line length.
@@ -252,6 +257,9 @@ export default class PDFCreator {
     if (pdfCreatorOptions.mapInfo) {
       this._setTextStyle('info');
       this.mapInfo = pdfCreatorOptions.mapInfo;
+      if (pdfCreatorOptions.obliqueLink) {
+        this.obliqueLink = pdfCreatorOptions.obliqueLink;
+      }
       this.mapInfoPlacement = this._calcMapInfoPlacement();
     }
 
@@ -704,6 +712,19 @@ export default class PDFCreator {
         this.mapInfoPlacement!.coords.y + this._calcTotalLineHeight(1),
         { baseline: 'hanging' },
       );
+      const heightOffset =
+        (this.pdfDoc.getLineHeight() * (this.mapInfo.text.length + 1)) /
+        JSPDF_PPI;
+      if (this.obliqueLink) {
+        this.pdfDoc.textWithLink(
+          translate('print.pdf.obliqueLinkText'),
+          this.mapInfoPlacement!.coords.x,
+          this.mapInfoPlacement!.coords.y +
+            this._calcTotalLineHeight(1) +
+            heightOffset,
+          { baseline: 'hanging', url: this.obliqueLink },
+        );
+      }
       this.pdfDoc.setFont(this.font, 'normal', fontWeights.BOLD);
       this.pdfDoc.text(
         this.mapInfo.header,

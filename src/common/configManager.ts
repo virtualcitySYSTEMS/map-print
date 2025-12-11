@@ -1,3 +1,4 @@
+import { type ProjectionOptions } from '@vcmap/core';
 import { parseBoolean, parseEnumValue } from '@vcsuite/parsers';
 import type { Pattern } from '@vcsuite/check';
 import { check, maybe, ofEnum, oneOf, strict } from '@vcsuite/check';
@@ -85,6 +86,14 @@ export type PrintConfig = {
   printLogo?: boolean;
   /** Whether map info should be printed on pdf. */
   printMapInfo?: boolean;
+  /** Whether oblique image name should be printed on pdf. Will be part of MapInfo */
+  printObliqueName?: boolean;
+  /** If passed, the oblique image link will be printed on pdf, replacing {image} by the image name. Will be part of MapInfo */
+  printObliqueLink?: string;
+  /** Whether coordinates should be printed on pdf. Will be part of MapInfo */
+  printCoordinates?: boolean;
+  /** The projection to be used for the coordinates. */
+  coordinatesProj?: ProjectionOptions;
   /** List of resolution the user can choose from for image/jpg creation. */
   resolutionList?: Array<number>;
   /** The default resolution. Needs to be in resolutionList. */
@@ -244,6 +253,22 @@ export function getConfigAndState(
     defaultOptions.printMapInfo,
   );
 
+  const printObliqueName: boolean = parseBoolean(
+    config.printObliqueName,
+    defaultOptions.printObliqueName,
+  );
+
+  const printObliqueLink: string | undefined =
+    config.printObliqueLink ?? defaultOptions.printObliqueLink;
+
+  const printCoordinates: boolean = parseBoolean(
+    config.printCoordinates,
+    defaultOptions.printCoordinates,
+  );
+
+  const coordinatesProj: ProjectionOptions =
+    config.coordinatesProj || defaultOptions.coordinatesProj;
+
   // screenshot
   /**
    * Available resolutions for screenshot. The value is always the longest side of the image.
@@ -283,6 +308,10 @@ export function getConfigAndState(
       legendOrientation,
       legendFormat,
       printMapInfo,
+      printObliqueName,
+      printObliqueLink,
+      printCoordinates,
+      coordinatesProj,
       contactDetails,
       // screenshot
       resolutionList,
@@ -330,6 +359,10 @@ export function validate(options: PrintConfig): void {
     );
     check(options.legendOrientation, maybe(ofEnum(LegendOrientationOptions)));
     check(options.printMapInfo, maybe(Boolean));
+    check(options.printObliqueName, maybe(Boolean));
+    check(options.printObliqueLink, maybe(String));
+    check(options.printCoordinates, maybe(Boolean));
+    check(options.coordinatesProj, maybe({ type: String, epsg: String }));
     check(options.resolutionList, maybe([Number]));
     const resolutionList =
       options.resolutionList || defaultOptions.resolutionList;

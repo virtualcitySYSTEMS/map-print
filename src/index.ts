@@ -133,7 +133,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
     i18n: {
       de: {
         print: {
-          editorTitle: 'Print Editor',
+          editorTitle: 'Druck-Editor',
           pdf: {
             tooltip: 'PDF der aktuellen Ansicht erstellen',
             header: 'PDF erstellen',
@@ -145,6 +145,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printFeatureInfo: 'Informationsfenster einbeziehen',
             titlePlaceholder: 'Titel',
             descriptionPlaceholder: 'Beschreibung (mehrzeilig möglich)',
+            obliqueLinkText: 'Link zum aktuellen Bildausschnitt',
             createButton: 'Erstellen',
             content: {
               contact: {
@@ -154,8 +155,9 @@ export default function plugin(options: PrintConfig): PrintPlugin {
                 fax: 'Fax',
               },
               mapInfo: 'Karteninformation',
-              centerCoordinate: 'Mittelpunkt (WGS84)',
-              cameraCoordinate: 'Aufnahmepunkt (WGS84)',
+              obliqueImageName: 'Schrägluftbild',
+              centerCoordinate: 'Mittelpunkt',
+              cameraCoordinate: 'Aufnahmepunkt',
             },
             iframeNotSupported:
               'Aufgrund technischer Beschränkungen können Legendenelemente des Typs Iframe nicht gedruckt werden.',
@@ -186,6 +188,11 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             allowDescription: 'Eingabefeld Beschreibung anzeigen',
             printLogo: 'Logo drucken',
             printMapInfo: 'Karteninformation drucken',
+            printObliqueName: 'Schrägluftbild drucken',
+            obliqueLink: 'Schrägluftbild-Link',
+            printObliqueLink: 'Schrägluftbild-Link drucken',
+            printObliqueLinkValidation: 'Schrägluftbild-Link ist ungültig',
+            printCoordinates: 'Mittelpunkt/Aufnahmepunkt drucken',
             printContactDetails: 'Kontaktinformationen drucken',
             printCopyright: 'Copyright drucken',
             printFeatureInfo: 'Drucken von FeatureInfo erlauben',
@@ -219,6 +226,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printFeatureInfo: 'Include information window',
             titlePlaceholder: 'Title',
             descriptionPlaceholder: 'Description (multiline possible)',
+            obliqueLinkText: 'Link to oblique image',
             createButton: 'Create',
             content: {
               contact: {
@@ -228,8 +236,9 @@ export default function plugin(options: PrintConfig): PrintPlugin {
                 fax: 'Fax',
               },
               mapInfo: 'Map information',
-              centerCoordinate: 'Center (WGS84)',
-              cameraCoordinate: 'Capture point (WGS84)',
+              obliqueImageName: 'Oblique image',
+              centerCoordinate: 'Center',
+              cameraCoordinate: 'Capture point',
             },
             iframeNotSupported:
               'Due to technical limitations, legend items of type Iframe cannot be printed.',
@@ -260,6 +269,11 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             allowDescription: 'Show description input',
             printLogo: 'Print logo',
             printMapInfo: 'Print map information',
+            printObliqueName: 'Print oblique image name',
+            obliqueLink: 'Oblique link',
+            printObliqueLink: 'Print oblique image link',
+            printObliqueLinkValidation: 'Oblique image link is invalid',
+            printCoordinates: 'Print center/camera coordinates',
             printContactDetails: 'Print contact details',
             printCopyright: 'Print copyright',
             printFeatureInfo: 'Allow FeatureInfo printing',

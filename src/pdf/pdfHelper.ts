@@ -1,4 +1,10 @@
-import { PanoramaMap } from '@vcmap/core';
+import type { ProjectionOptions } from '@vcmap/core';
+import {
+  ObliqueMap,
+  PanoramaMap,
+  Projection,
+  wgs84Projection,
+} from '@vcmap/core';
 import type {
   ImageLegendItem,
   LegendEntry,
@@ -71,6 +77,34 @@ export async function getLogo(app: VcsUiApp): Promise<HTMLImageElement> {
   return logo;
 }
 
+function getCoordinateInfo(
+  position: number[],
+  projectionOptions: ProjectionOptions,
+): {
+  coordsHeader: string;
+  coords?: string;
+} {
+  const projection = new Projection(projectionOptions);
+  const coords = projection.transformFrom(wgs84Projection, position);
+  const units = projection.proj.getUnits();
+  const sign = units === 'degrees' ? '°' : units;
+  if (projection.equals(wgs84Projection)) {
+    return {
+      coordsHeader: `(WGS84): ${coords[0].toFixed(6)}${sign}, ${coords[1].toFixed(6)}${sign}`,
+    };
+  }
+  const x = (Math.round(coords[0] * 100) / 100).toLocaleString() + sign;
+  const y = (Math.round(coords[1] * 100) / 100).toLocaleString() + sign;
+  const z =
+    coords[2] && Math.abs(coords[2]) > 0.01
+      ? (Math.round(coords[2] * 100) / 100).toLocaleString() + sign
+      : undefined;
+  return {
+    coordsHeader: `(${Projection.parseEPSGCode(projection.epsg)}):`,
+    coords: `x: ${x}  y: ${y}${z ? `  z: ${z}` : ''}`,
+  };
+}
+
 /**
  * Get informations about the current map view.
  * @param app The vcs ui app.
@@ -78,27 +112,64 @@ export async function getLogo(app: VcsUiApp): Promise<HTMLImageElement> {
  */
 export async function getMapInfo(
   app: VcsUiApp,
+  printObliqueName: boolean,
+  printCoordinates: boolean,
+  projectionOptions: ProjectionOptions,
 ): Promise<TextWithHeader | undefined> {
-  const header = app.vueI18n.t('print.pdf.content.mapInfo');
-  const viewpoint = await app.maps.activeMap?.getViewpoint();
-  const groundPosition = viewpoint?.groundPosition;
-  const cameraPosition = viewpoint?.cameraPosition;
+  const text: string[] = [];
 
-  if (groundPosition) {
-    const coordinates = `${app.vueI18n.t(
-      'print.pdf.content.centerCoordinate',
-    )}: ${groundPosition[0].toFixed(4)}, ${groundPosition[1].toFixed(4)}`;
-    // text can be extended by other informations like layers
-    return { header, text: [coordinates] };
-  } else if (cameraPosition && app.maps.activeMap instanceof PanoramaMap) {
-    const coordinates = `${app.vueI18n.t(
-      'print.pdf.content.cameraCoordinate',
-    )}: ${cameraPosition[0].toFixed(4)}, ${cameraPosition[1].toFixed(4)}`;
-    return { header, text: [coordinates] };
-  } else {
-    getLogger(name).error('Map center cannot be determined');
-    return undefined;
+  const map = app.maps.activeMap;
+  if (printObliqueName && map instanceof ObliqueMap && map.currentImage) {
+    text.push(
+      `${app.vueI18n.t('print.pdf.content.obliqueImageName')}: ${map.currentImage.name}`,
+    );
   }
+
+  if (printCoordinates) {
+    const viewpoint = await app.maps.activeMap?.getViewpoint();
+    const groundPosition = viewpoint?.groundPosition;
+    const cameraPosition = viewpoint?.cameraPosition;
+
+    if (groundPosition) {
+      const { coordsHeader, coords } = getCoordinateInfo(
+        groundPosition,
+        projectionOptions,
+      );
+      text.push(
+        `${app.vueI18n.t('print.pdf.content.centerCoordinate')} ${coordsHeader}`,
+      );
+      if (coords) {
+        text.push(coords);
+      }
+      // text can be extended by other informations like layers
+    } else if (cameraPosition && map instanceof PanoramaMap) {
+      const { coordsHeader, coords } = getCoordinateInfo(
+        cameraPosition,
+        projectionOptions,
+      );
+      text.push(
+        `${app.vueI18n.t('print.pdf.content.cameraCoordinate')} ${coordsHeader}`,
+      );
+      if (coords) {
+        text.push(coords);
+      }
+    } else {
+      getLogger(name).error('Map center cannot be determined');
+    }
+  }
+
+  return { header: app.vueI18n.t('print.pdf.content.mapInfo'), text };
+}
+
+export function getObliqueLink(
+  app: VcsUiApp,
+  obliqueLinkTemplate: string,
+): string | undefined {
+  const map = app.maps.activeMap;
+  if (map instanceof ObliqueMap && map.currentImage) {
+    return obliqueLinkTemplate.replace('{image}', map.currentImage.name);
+  }
+  return undefined;
 }
 
 /**

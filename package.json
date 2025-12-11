@@ -45,13 +45,12 @@
   ],
   "prettier": "@vcsuite/eslint-config/prettier.js",
   "peerDependencies": {
-    "@vcmap/core": "^6.2.1",
-    "@vcmap/ui": "^6.2.0",
+    "@vcmap/core": "^6.2.3",
+    "@vcmap/ui": "^6.2.2",
     "vue": "~3.4.38",
     "vuetify": "~3.7.14"
   },
   "overrides": {
-    "@vcmap/core": "^6.2.1",
     "esbuild": "^0.25.0"
   },
   "devDependencies": {
@@ -61,7 +60,7 @@
     "jest-canvas-mock": "^2.5.2",
     "jsdom": "^24.1.1",
     "resize-observer-polyfill": "^1.5.1",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
     "vite-plugin-vuetify": "^2.0.3",
     "vitest": "^2.1.9",
     "vue-tsc": "^2.2.12"

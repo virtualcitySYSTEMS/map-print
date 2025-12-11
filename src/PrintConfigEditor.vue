@@ -108,17 +108,70 @@
             />
           </v-col>
         </v-row>
-        <v-row v-for="key in configKeys" :key="key" no-gutters>
-          <v-col class="pl-1">
-            <VcsCheckbox
-              :id="key"
-              v-model="localConfig[key]"
-              :true-value="true"
-              :false-value="false"
-              :label="`print.editor.${key}`"
-            />
-          </v-col>
-        </v-row>
+        <div v-for="key in configKeys" :key="key">
+          <v-row no-gutters>
+            <v-col class="pl-1">
+              <VcsCheckbox
+                :id="key"
+                v-model="localConfig[key]"
+                :true-value="true"
+                :false-value="false"
+                :label="`print.editor.${key}`"
+              />
+            </v-col>
+          </v-row>
+          <template v-if="key === 'printMapInfo' && localConfig.printMapInfo">
+            <v-row no-gutters>
+              <v-col class="pl-5">
+                <VcsCheckbox
+                  v-model="localConfig.printObliqueName"
+                  :true-value="true"
+                  :false-value="false"
+                  label="print.editor.printObliqueName"
+                />
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col class="pl-5">
+                <VcsCheckbox
+                  v-model="printObliqueLink"
+                  label="print.editor.printObliqueLink"
+                />
+              </v-col>
+              <v-col v-if="printObliqueLink">
+                <VcsTextField
+                  v-model="localConfig.printObliqueLink"
+                  :label="$t('print.editor.obliqueLink')"
+                  placeholder="www.example.org/images/{image}"
+                  clearable
+                  :rules="[
+                    (v: string) =>
+                      !!v || 'print.editor.printObliqueLinkValidation',
+                  ]"
+                />
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col class="pl-5">
+                <VcsCheckbox
+                  v-model="localConfig.printCoordinates"
+                  :true-value="true"
+                  :false-value="false"
+                  label="print.editor.printCoordinates"
+                />
+              </v-col>
+            </v-row>
+            <v-row v-if="localConfig.printCoordinates" no-gutters>
+              <v-col class="pl-9">
+                <VcsProjection
+                  v-model="localConfig.coordinatesProj"
+                  required
+                  hide-alias
+                />
+              </v-col>
+            </v-row>
+          </template>
+        </div>
         <!-- Legend config -->
         <span v-if="localConfig.printLegend">
           <v-row no-gutters class="pl-5">
@@ -238,7 +291,9 @@
     VcsSelect,
     VcsCheckbox,
     VcsChipArrayInput,
+    VcsProjection,
   } from '@vcmap/ui';
+  import { Projection, wgs84Projection } from '@vcmap/core';
   import type { PropType } from 'vue';
   import { defineComponent, ref, toRaw } from 'vue';
   import getDefaultOptions from './defaultOptions.js';
@@ -256,12 +311,13 @@
       VRow,
       VCol,
       AbstractConfigEditor,
-      VcsFormSection,
-      VcsLabel,
-      VcsSelect,
-      VcsTextField,
       VcsCheckbox,
       VcsChipArrayInput,
+      VcsFormSection,
+      VcsLabel,
+      VcsProjection,
+      VcsSelect,
+      VcsTextField,
     },
     props: {
       getConfig: {
@@ -280,6 +336,7 @@
         Object.assign(structuredClone(defaultOptions), config),
       );
 
+      const printObliqueLink = ref(!!config.printObliqueLink);
       const printContactDetails = ref(
         !!(
           config.contactDetails && Object.keys(config.contactDetails).length > 0
@@ -313,8 +370,8 @@
         'allowTitle',
         'allowDescription',
         'printLogo',
-        'printMapInfo',
         'printCopyright',
+        'printMapInfo',
         'printFeatureInfo',
         'printLegend',
       ]);
@@ -346,6 +403,31 @@
         ) {
           delete localConfig.value.contactDetails;
         }
+        if (!printObliqueLink.value) {
+          delete localConfig.value.printObliqueLink;
+        }
+        if (!localConfig.value.printMapInfo) {
+          localConfig.value.printObliqueName = false;
+          localConfig.value.printCoordinates = false;
+          delete localConfig.value.coordinatesProj;
+        }
+        if (
+          !localConfig.value.printCoordinates &&
+          !localConfig.value.printObliqueName
+        ) {
+          localConfig.value.printMapInfo = false;
+          delete localConfig.value.coordinatesProj;
+        }
+        const { coordinatesProj } = localConfig.value;
+        if (coordinatesProj) {
+          if (
+            !Projection.validateOptions(coordinatesProj) ||
+            new Projection(coordinatesProj).equals(wgs84Projection)
+          ) {
+            delete localConfig.value.coordinatesProj;
+          }
+        }
+
         props.setConfig(structuredClone(toRaw(localConfig.value)));
       };
 
@@ -355,6 +437,7 @@
         legendOrientationOptions,
         legendFormatOptions,
         printContactDetails,
+        printObliqueLink,
         contactKeys,
         configKeys,
         updateDefault,

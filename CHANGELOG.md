@@ -1,4 +1,12 @@
-# v3.0.1
+# v4.0.1
+
+- Added new configuration options extending the Map Information section of the PDF:
+  - `printObliqueName`, printing the name of the current oblique image;
+  - `printCoordinates`, printing the coordinates of the center of the map or of the camera in Panorama;
+  - `coordinatesProj`, allowing to print the coordinates in another CRS than the default WGS84
+  - `printObliqueLink`, allowing to link the printed Oblique image with a link which includes `{image}` which will be replaced by the image name
+
+# v4.0.0
 
 - Updates @vcmap/core and @vcmap/ui to version 6.2
 - Adds support for Panorama Map
