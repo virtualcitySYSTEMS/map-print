@@ -145,7 +145,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printFeatureInfo: 'Informationsfenster einbeziehen',
             titlePlaceholder: 'Titel',
             descriptionPlaceholder: 'Beschreibung (mehrzeilig möglich)',
-            obliqueLinkText: 'Link zum aktuellen Bildausschnitt',
+            mapLinkText: 'Link zur Karte',
             createButton: 'Erstellen',
             content: {
               contact: {
@@ -189,9 +189,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printLogo: 'Logo drucken',
             printMapInfo: 'Karteninformation drucken',
             printObliqueName: 'Schrägluftbild drucken',
-            obliqueLink: 'Schrägluftbild-Link',
-            printObliqueLink: 'Schrägluftbild-Link drucken',
-            printObliqueLinkValidation: 'Schrägluftbild-Link ist ungültig',
+            printLinkToMap: 'Link zur Karte drucken',
             printCoordinates: 'Mittelpunkt/Aufnahmepunkt drucken',
             printContactDetails: 'Kontaktinformationen drucken',
             printCopyright: 'Copyright drucken',
@@ -226,7 +224,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printFeatureInfo: 'Include information window',
             titlePlaceholder: 'Title',
             descriptionPlaceholder: 'Description (multiline possible)',
-            obliqueLinkText: 'Link to oblique image',
+            mapLinkText: 'Link to map',
             createButton: 'Create',
             content: {
               contact: {
@@ -270,9 +268,7 @@ export default function plugin(options: PrintConfig): PrintPlugin {
             printLogo: 'Print logo',
             printMapInfo: 'Print map information',
             printObliqueName: 'Print oblique image name',
-            obliqueLink: 'Oblique link',
-            printObliqueLink: 'Print oblique image link',
-            printObliqueLinkValidation: 'Oblique image link is invalid',
+            printLinkToMap: 'Print link to map',
             printCoordinates: 'Print center/camera coordinates',
             printContactDetails: 'Print contact details',
             printCopyright: 'Print copyright',

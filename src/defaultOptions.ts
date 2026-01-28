@@ -16,7 +16,7 @@ export default (): Required<PrintConfig> => {
     allowDescription: true,
     printLogo: true,
     printMapInfo: true,
-    printObliqueLink: '',
+    printLinkToMap: false,
     printObliqueName: true,
     printCoordinates: true,
     coordinatesProj: { type: 'Projection', epsg: 'EPSG:4326' },

@@ -16,6 +16,7 @@ import {
   getAttributions,
   LegendType,
   NotificationType,
+  setStateToUrl,
   // @ts-expect-error {no exported member VcsDefaultLogo because of bug in UI. Issue 664}
   VcsDefaultLogo,
 } from '@vcmap/ui';
@@ -161,15 +162,11 @@ export async function getMapInfo(
   return { header: app.vueI18n.t('print.pdf.content.mapInfo'), text };
 }
 
-export function getObliqueLink(
-  app: VcsUiApp,
-  obliqueLinkTemplate: string,
-): string | undefined {
-  const map = app.maps.activeMap;
-  if (map instanceof ObliqueMap && map.currentImage) {
-    return obliqueLinkTemplate.replace('{image}', map.currentImage.name);
-  }
-  return undefined;
+export async function getMapLink(app: VcsUiApp): Promise<string> {
+  const state = await app.getState(true);
+  const url = new URL(window.location.href);
+  setStateToUrl(state, url);
+  return url.toString();
 }
 
 /**

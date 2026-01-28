@@ -4,7 +4,8 @@
   - `printObliqueName`, printing the name of the current oblique image;
   - `printCoordinates`, printing the coordinates of the center of the map or of the camera in Panorama;
   - `coordinatesProj`, allowing to print the coordinates in another CRS than the default WGS84
-  - `printObliqueLink`, allowing to link the printed Oblique image with a link which includes `{image}` which will be replaced by the image name
+  - `printLinkToMap`, allowing to print a link to the map
+- Updated jsPDF dependency to version 4.x
 
 # v4.0.0
 

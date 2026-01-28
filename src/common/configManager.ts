@@ -88,8 +88,8 @@ export type PrintConfig = {
   printMapInfo?: boolean;
   /** Whether oblique image name should be printed on pdf. Will be part of MapInfo */
   printObliqueName?: boolean;
-  /** If passed, the oblique image link will be printed on pdf, replacing {image} by the image name. Will be part of MapInfo */
-  printObliqueLink?: string;
+  /** Whether link to map should be printed on pdf. Will be part of MapInfo */
+  printLinkToMap?: boolean;
   /** Whether coordinates should be printed on pdf. Will be part of MapInfo */
   printCoordinates?: boolean;
   /** The projection to be used for the coordinates. */
@@ -258,8 +258,10 @@ export function getConfigAndState(
     defaultOptions.printObliqueName,
   );
 
-  const printObliqueLink: string | undefined =
-    config.printObliqueLink ?? defaultOptions.printObliqueLink;
+  const printLinkToMap: boolean = parseBoolean(
+    config.printLinkToMap,
+    defaultOptions.printLinkToMap,
+  );
 
   const printCoordinates: boolean = parseBoolean(
     config.printCoordinates,
@@ -309,7 +311,7 @@ export function getConfigAndState(
       legendFormat,
       printMapInfo,
       printObliqueName,
-      printObliqueLink,
+      printLinkToMap,
       printCoordinates,
       coordinatesProj,
       contactDetails,
@@ -360,7 +362,7 @@ export function validate(options: PrintConfig): void {
     check(options.legendOrientation, maybe(ofEnum(LegendOrientationOptions)));
     check(options.printMapInfo, maybe(Boolean));
     check(options.printObliqueName, maybe(Boolean));
-    check(options.printObliqueLink, maybe(String));
+    check(options.printLinkToMap, maybe(Boolean));
     check(options.printCoordinates, maybe(Boolean));
     check(options.coordinatesProj, maybe({ type: String, epsg: String }));
     check(options.resolutionList, maybe([Number]));

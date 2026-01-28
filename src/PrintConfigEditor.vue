@@ -134,20 +134,8 @@
             <v-row no-gutters>
               <v-col class="pl-5">
                 <VcsCheckbox
-                  v-model="printObliqueLink"
-                  label="print.editor.printObliqueLink"
-                />
-              </v-col>
-              <v-col v-if="printObliqueLink">
-                <VcsTextField
-                  v-model="localConfig.printObliqueLink"
-                  :label="$t('print.editor.obliqueLink')"
-                  placeholder="www.example.org/images/{image}"
-                  clearable
-                  :rules="[
-                    (v: string) =>
-                      !!v || 'print.editor.printObliqueLinkValidation',
-                  ]"
+                  v-model="localConfig.printLinkToMap"
+                  label="print.editor.printLinkToMap"
                 />
               </v-col>
             </v-row>
@@ -336,7 +324,6 @@
         Object.assign(structuredClone(defaultOptions), config),
       );
 
-      const printObliqueLink = ref(!!config.printObliqueLink);
       const printContactDetails = ref(
         !!(
           config.contactDetails && Object.keys(config.contactDetails).length > 0
@@ -403,9 +390,6 @@
         ) {
           delete localConfig.value.contactDetails;
         }
-        if (!printObliqueLink.value) {
-          delete localConfig.value.printObliqueLink;
-        }
         if (!localConfig.value.printMapInfo) {
           localConfig.value.printObliqueName = false;
           localConfig.value.printCoordinates = false;
@@ -437,7 +421,6 @@
         legendOrientationOptions,
         legendFormatOptions,
         printContactDetails,
-        printObliqueLink,
         contactKeys,
         configKeys,
         updateDefault,
