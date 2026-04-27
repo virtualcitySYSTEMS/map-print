@@ -132,17 +132,18 @@
   import {
     getLogo,
     formatContactInfo,
+    getSwipeToolCanvas,
+    getElementCanvas,
     getMapInfo,
     getCopyright,
     parseLegend,
-    getWindowsCanvas,
     getMapLink,
   } from './pdfHelper.js';
   import {
     LegendOrientationOptions,
     OrientationOptions,
   } from '../common/configManager.js';
-  import { getMapSize } from '../common/util.js';
+  import { getMapElement, getMapSize } from '../common/util.js';
   import { name } from '../../package.json';
 
   export const pdfWindowId = 'create_pdf_window_id';
@@ -190,7 +191,9 @@
       /** Creates pdf by utilizing the PDFCreator. Handling is done by default function in shootScreenAndHandle.js */
       async function createPdf(): Promise<void> {
         running.value = true;
-        const mapSize = getMapSize(app.maps.activeMap!);
+        const activeMap = app.maps.activeMap!;
+        const mapElement = getMapElement(activeMap);
+        const mapSize = getMapSize(activeMap);
 
         let logo;
         if (config.printLogo) {
@@ -274,10 +277,19 @@
         /** The windows to be overprinted on the map. */
         const overlayWindows: CanvasAndPlacement[] = [];
 
+        const swipeOverlay = await getSwipeToolCanvas(
+          app,
+          mapElement,
+          state.selectedPpi,
+        );
+        if (swipeOverlay) {
+          overlayWindows.push(swipeOverlay);
+        }
+
         if (enableFeatureInfoPrinting.value && printFeatureInfo.value) {
-          const featureInfo = await getWindowsCanvas(
-            app.featureInfo.windowId!,
-            mapSize,
+          const featureInfo = await getElementCanvas(
+            `window-component--${app.featureInfo.windowId!}`,
+            mapElement,
             state.selectedPpi,
           );
           if (featureInfo) {

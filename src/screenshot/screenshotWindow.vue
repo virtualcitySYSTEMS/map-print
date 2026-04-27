@@ -54,7 +54,8 @@
   } from 'vuetify/components';
   import type { PrintPlugin } from '../index.js';
   import createAndHandleBlob from './shootScreenAndHandle.js';
-  import { getMapSize } from '../common/util.js';
+  import { getMapElement, getMapSize } from '../common/util.js';
+  import { getSwipeToolCanvas } from '../pdf/pdfHelper.js';
   import { name } from '../../package.json';
 
   export const screenshotWindowId = 'create_screenshot_window_id';
@@ -145,11 +146,25 @@
             canvas.toBlob(resolve, 'image/jpeg');
           });
         };
+        const map = app.maps.activeMap!;
+        const mapElement = getMapElement(map);
         const width =
           mapAspectRatio.value >= 1
             ? state.selectedResolution
             : state.selectedResolution * mapAspectRatio.value;
-        await createAndHandleBlob(app, width, jpgCreateFunction, 'map.jpg');
+        const swipeOverlay = await getSwipeToolCanvas(
+          app,
+          mapElement,
+          state.selectedPpi,
+        );
+        const overlays = swipeOverlay ? [swipeOverlay] : undefined;
+        await createAndHandleBlob(
+          app,
+          width,
+          jpgCreateFunction,
+          'map.jpg',
+          overlays,
+        );
         running.value = false;
       }
 

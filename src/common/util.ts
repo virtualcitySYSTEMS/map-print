@@ -119,3 +119,17 @@ export function getMapSize(map: VcsMap): Size {
   }
   return { width, height };
 }
+
+/**
+ * Returns the DOM element used as the reference frame for map overlays.
+ * @param map A VcsMap instance
+ * @returns The HTMLElement representing the map viewport.
+ */
+export function getMapElement(map: VcsMap): HTMLElement {
+  if (map instanceof CesiumMap || map instanceof PanoramaMap) {
+    return map.getCesiumWidget()!.container as HTMLElement;
+  } else if (map instanceof OpenlayersMap || map instanceof ObliqueMap) {
+    return map.olMap!.getViewport();
+  }
+  throw new Error('map not supported');
+}

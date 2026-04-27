@@ -8,6 +8,7 @@
     "prepublishOnly": "vcmplugin build",
     "build": "vcmplugin build",
     "bundle": "vcmplugin bundle",
+    "audit": "npm audit --omit=peer --omit=dev --omit=optional",
     "start": "vcmplugin serve",
     "preview": "vcmplugin preview",
     "buildStagingApp": "vcmplugin buildStagingApp",
@@ -45,8 +46,8 @@
   ],
   "prettier": "@vcsuite/eslint-config/prettier.js",
   "peerDependencies": {
-    "@vcmap/core": "^6.2.3",
-    "@vcmap/ui": "^6.2.2",
+    "@vcmap/core": "^6.2.4",
+    "@vcmap/ui": "^6.2.8",
     "vue": "~3.4.38",
     "vuetify": "~3.7.14"
   },
